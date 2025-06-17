@@ -936,19 +936,15 @@
         <!-- Stats Overview -->
         <div class="stats-overview">
             <div class="stat-card">
-                <div class="stat-number">50+</div>
+                <div class="stat-number">20+</div>
                 <div class="stat-label">Total Vulnerabilities</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number">15</div>
+                <div class="stat-number">11</div>
                 <div class="stat-label">Critical Findings</div>
             </div>
             <div class="stat-card">
                 <div class="stat-number">10+</div>
-                <div class="stat-label">CVEs Assigned</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number">25+</div>
                 <div class="stat-label">Companies Secured</div>
             </div>
         </div>
@@ -966,24 +962,20 @@
         <div class="vulnerabilities-grid">
             <div class="vulnerability-card" data-severity="critical" style="--card-index: 0; --severity-color: var(--neon-red)">
                 <div class="vuln-header">
-                    <h3 class="vuln-title">Remote Code Execution</h3>
+                    <h3 class="vuln-title"> .env file exposure</h3>
                     <span class="severity-badge severity-critical">Critical</span>
                 </div>
                 <div class="vuln-company">
                     <i class="fas fa-building"></i>
-                    Major E-commerce Platform
+                    Educational platform
                 </div>
                 <p class="vuln-description">
-                    Discovered a critical RCE vulnerability in the payment processing system allowing arbitrary code execution through unsanitized input fields.
+                    I discovered a vulnerability that leads to the leakage of the .env file, which contained database credentials and Office accounts.
                 </p>
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>March 2024</span>
-                    </div>
-                    <div class="detail-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>$5000 Bounty</span>
+                        <span>2025/01</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-shield-alt"></i>
@@ -991,7 +983,7 @@
                     </div>
                 </div>
                 <div class="vuln-tags">
-                    <span class="tag">RCE</span>
+                    <span class="tag">Database</span>
                     <span class="tag">Authentication Bypass</span>
                     <span class="tag">Payment System</span>
                 </div>
@@ -1004,7 +996,7 @@
                 </div>
                 <div class="vuln-company">
                     <i class="fas fa-university"></i>
-                    University System
+                    Educational platform
                 </div>
                 <p class="vuln-description">
                     Critical SQL injection in student portal allowing complete database access and modification of grades, personal data, and administrative functions.
@@ -1012,7 +1004,7 @@
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>January 2024</span>
+                        <span>2025/01</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-award"></i>
@@ -1032,24 +1024,24 @@
 
             <div class="vulnerability-card" data-severity="high" style="--card-index: 2; --severity-color: var(--neon-orange)">
                 <div class="vuln-header">
-                    <h3 class="vuln-title">JWT Token Forgery</h3>
-                    <span class="severity-badge severity-high">High</span>
+                    <h3 class="vuln-title">PII information disclosure</h3>
+                    <span class="severity-badge severity-critical">Critical</span>
                 </div>
                 <div class="vuln-company">
-                    <i class="fas fa-mobile-alt"></i>
-                    Mobile Banking App
+                    <i class="fas fa-building"></i>
+                    A major fashion platform
                 </div>
                 <p class="vuln-description">
-                    JWT implementation flaw allowing token forgery and privilege escalation to admin accounts through algorithm confusion attack.
+                    I discovered a misconfiguration in the company's Firebase setup that allowed me to access data of around 80,000 users.
                 </p>
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>February 2024</span>
+                        <span>2025/06</span>
                     </div>
                     <div class="detail-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>$3000 Bounty</span>
+                        <i class="fas fa-award"></i>
+                        <span>Recognition Award</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-shield-alt"></i>
@@ -1057,32 +1049,32 @@
                     </div>
                 </div>
                 <div class="vuln-tags">
-                    <span class="tag">JWT</span>
+                    <span class="tag">PII</span>
                     <span class="tag">Authentication</span>
-                    <span class="tag">Mobile</span>
+                    <span class="tag">Web App</span>
                 </div>
             </div>
 
             <div class="vulnerability-card" data-severity="high" style="--card-index: 3; --severity-color: var(--neon-orange)">
                 <div class="vuln-header">
-                    <h3 class="vuln-title">IDOR to PII Access</h3>
-                    <span class="severity-badge severity-high">High</span>
+                    <h3 class="vuln-title">Authentication bypass</h3>
+                    <span class="severity-badge severity-critical">Critical</span>
                 </div>
                 <div class="vuln-company">
                     <i class="fas fa-heartbeat"></i>
-                    Healthcare Platform
+                    A major hiring platform
                 </div>
                 <p class="vuln-description">
-                    Insecure Direct Object Reference vulnerability exposing patient medical records and personal health information through API endpoints.
+                    An improper session expiration vulnerability that allowed bypassing 2FA and gaining full access to the account.
                 </p>
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>December 2023</span>
+                        <span>2025/04</span>
                     </div>
                     <div class="detail-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>$4000 Bounty</span>
+                        <i class="fas fa-award"></i>
+                        <span>Dublicate</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-shield-alt"></i>
@@ -1090,32 +1082,32 @@
                     </div>
                 </div>
                 <div class="vuln-tags">
-                    <span class="tag">IDOR</span>
+                    <span class="tag">Authentication bypass</span>
                     <span class="tag">API</span>
-                    <span class="tag">Healthcare</span>
+                    <span class="tag">Account Takeover</span>
                 </div>
             </div>
 
             <div class="vulnerability-card" data-severity="medium" style="--card-index: 4; --severity-color: var(--neon-yellow)">
                 <div class="vuln-header">
-                    <h3 class="vuln-title">XSS in Admin Panel</h3>
-                    <span class="severity-badge severity-medium">Medium</span>
+                    <h3 class="vuln-title">Authorization bypass</h3>
+                    <span class="severity-badge severity-critical">Critical</span>
                 </div>
                 <div class="vuln-company">
                     <i class="fas fa-shopping-cart"></i>
                     E-commerce CMS
                 </div>
                 <p class="vuln-description">
-                    Stored XSS vulnerability in admin panel allowing execution of malicious JavaScript code affecting all administrators.
+                    Authorization bypass during the SSH server linking process, where the server allows a user with read-only permissions to access this function and obtain an admin role from the server's response.
                 </p>
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>November 2023</span>
+                        <span>2025/05</span>
                     </div>
                     <div class="detail-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>$1500 Bounty</span>
+                        <i class="fas fa-award"></i>
+                        <span>Dublicate</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-shield-alt"></i>
@@ -1123,8 +1115,8 @@
                     </div>
                 </div>
                 <div class="vuln-tags">
-                    <span class="tag">XSS</span>
-                    <span class="tag">Admin Panel</span>
+                    <span class="tag">Authorization bypass</span>
+                    <span class="tag">Admin Role</span>
                     <span class="tag">CMS</span>
                 </div>
             </div>
@@ -1132,23 +1124,23 @@
             <div class="vulnerability-card" data-severity="low" style="--card-index: 5; --severity-color: var(--neon-blue)">
                 <div class="vuln-header">
                     <h3 class="vuln-title">Information Disclosure</h3>
-                    <span class="severity-badge severity-low">Low</span>
+                    <span class="severity-badge severity-critical">Critical</span>
                 </div>
                 <div class="vuln-company">
                     <i class="fas fa-cloud"></i>
                     Cloud Storage Service
                 </div>
                 <p class="vuln-description">
-                    Exposed debug endpoints revealing internal server information and API keys in production environment.
+                    Leak of a Firebase key with admin privileges, which allowed me to create my own account and gain full access to everything in the Firebase project.
                 </p>
                 <div class="vuln-details">
                     <div class="detail-item">
                         <i class="fas fa-calendar"></i>
-                        <span>October 2023</span>
+                        <span>2025/05</span>
                     </div>
-                    <div class="detail-item">
-                        <i class="fas fa-dollar-sign"></i>
-                        <span>$500 Bounty</span>
+                     <div class="detail-item">
+                        <i class="fas fa-award"></i>
+                        <span>Dublicate</span>
                     </div>
                     <div class="detail-item">
                         <i class="fas fa-shield-alt"></i>
@@ -1157,38 +1149,12 @@
                 </div>
                 <div class="vuln-tags">
                     <span class="tag">Info Disclosure</span>
-                    <span class="tag">Debug</span>
+                    <span class="tag">Privileges Escalation</span>
                     <span class="tag">Cloud</span>
                 </div>
             </div>
         </div>
 
-        <!-- CVE Section -->
-        <div class="cve-section">
-            <h2 class="cve-title">Assigned CVEs</h2>
-            <div class="cve-list">
-                <div class="cve-item">
-                    <div class="cve-number">CVE-2024-1337</div>
-                    <div class="cve-score">9.8</div>
-                    <p>Critical RCE in Payment Gateway</p>
-                </div>
-                <div class="cve-item">
-                    <div class="cve-number">CVE-2024-1338</div>
-                    <div class="cve-score">8.9</div>
-                    <p>SQL Injection in Admin Portal</p>
-                </div>
-                <div class="cve-item">
-                    <div class="cve-number">CVE-2023-9999</div>
-                    <div class="cve-score">7.5</div>
-                    <p>Authentication Bypass in API</p>
-                </div>
-                <div class="cve-item">
-                    <div class="cve-number">CVE-2023-8888</div>
-                    <div class="cve-score">8.2</div>
-                    <p>IDOR to Sensitive Data</p>
-                </div>
-            </div>
-        </div>
 
         <!-- Hall of Fame -->
         <div class="hall-of-fame">
@@ -1205,11 +1171,6 @@
                     <div class="company-vulns">8 Vulnerabilities</div>
                 </div>
                 <div class="company-card">
-                    <i class="fas fa-bank company-icon"></i>
-                    <div class="company-name">Banking</div>
-                    <div class="company-vulns">6 Vulnerabilities</div>
-                </div>
-                <div class="company-card">
                     <i class="fas fa-heartbeat company-icon"></i>
                     <div class="company-name">Healthcare</div>
                     <div class="company-vulns">4 Vulnerabilities</div>
@@ -1219,27 +1180,22 @@
                     <div class="company-name">Cloud Services</div>
                     <div class="company-vulns">7 Vulnerabilities</div>
                 </div>
-                <div class="company-card">
-                    <i class="fas fa-mobile-alt company-icon"></i>
-                    <div class="company-name">Mobile Apps</div>
-                    <div class="company-vulns">9 Vulnerabilities</div>
-                </div>
             </div>
         </div>
     </div>
 
     <!-- Social Links -->
     <div class="social-links">
-        <a href="https://github.com/mon3m" class="social-link" target="_blank">
+        <a href="https://github.com/UniShotProject" class="social-link" target="_blank">
             <i class="fab fa-github"></i>
         </a>
-        <a href="https://linkedin.com/in/mon3m" class="social-link" target="_blank">
+        <a href="https://www.linkedin.com/in/mohamed-abd-el-moneam-162933315" class="social-link" target="_blank">
             <i class="fab fa-linkedin"></i>
         </a>
-        <a href="https://twitter.com/mon3m" class="social-link" target="_blank">
+        <a href="https://x.com/UniShotProject" class="social-link" target="_blank">
             <i class="fab fa-twitter"></i>
         </a>
-        <a href="mailto:contact@mon3m.com" class="social-link">
+        <a href="mailto:mahmed.ismail14@gmail.com" class="social-link">
             <i class="fas fa-envelope"></i>
         </a>
     </div>
