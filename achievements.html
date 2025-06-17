@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Achievements - mon3m</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Include common styles */
+        /* Achievements Page Specific Styles */
+        .achievements-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 150px 20px 100px;
+        }
+
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 40px;
+            margin-top: 60px;
+        }
+
+        .achievement-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.9));
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            animation: fadeInScale 0.8s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .achievement-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .achievement-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.4);
+            border-color: var(--neon-green);
+        }
+
+        .achievement-icon {
+            font-size: 4rem;
+            color: var(--neon-green);
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .achievement-title {
+            font-size: 1.8rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+        }
+
+        .achievement-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        .stats-section {
+            margin-top: 100px;
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 30px;
+            padding: 60px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .stat-item {
+            position: relative;
+        }
+
+        .stat-number {
+            font-size: 4rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: countUp 2s ease-out;
+        }
+
+        @keyframes countUp {
+            from { opacity: 0; transform: scale(0.5); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .certifications-section {
+            margin-top: 100px;
+        }
+
+        .cert-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .cert-card {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid var(--neon-blue);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cert-card::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 20px;
+            animation: borderGradient 3s linear infinite;
+        }
+
+        .cert-card:hover::after {
+            opacity: 1;
+        }
+
+        .cert-card:hover {
+            transform: scale(1.05);
+            background: rgba(10, 10, 10, 0.9);
+        }
+
+        .cert-logo {
+            width: 80px;
+            height: 80px;
+            background: var(--neon-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2.5rem;
+            color: var(--dark-bg);
+        }
+
+        .cert-name {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .cert-issuer {
+            color: var(--neon-blue);
+            margin-bottom: 10px;
+        }
+
+        .cert-date {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .recognition-section {
+            margin-top: 100px;
+            text-align: center;
+        }
+
+        .recognition-timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 60px auto;
+        }
+
+        .recognition-timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-green), var(--neon-blue));
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .recognition-item {
+            position: relative;
+            padding: 30px;
+            width: 50%;
+            animation: fadeInSlide 1s ease-out;
+        }
+
+        .recognition-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+            padding-right: 60px;
+        }
+
+        .recognition-item:nth-child(even) {
+            left: 50%;
+            padding-left: 60px;
+        }
+
+        @keyframes fadeInSlide {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .recognition-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-pink);
+            border-radius: 50%;
+            top: 40px;
+            box-shadow: 0 0 20px var(--neon-pink);
+            animation: pulseDot 2s infinite;
+        }
+
+        .recognition-item:nth-child(odd) .recognition-dot {
+            right: -10px;
+        }
+
+        .recognition-item:nth-child(even) .recognition-dot {
+            left: -10px;
+        }
+
+        .recognition-content {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 0, 102, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .recognition-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 0, 102, 0.3);
+            border-color: var(--neon-pink);
+        }
+
+        .recognition-title {
+            font-size: 1.5rem;
+            color: var(--neon-pink);
+            margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .recognition-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .recognition-timeline::before {
+                left: 30px;
+            }
+
+            .recognition-item {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 80px !important;
+                padding-right: 20px !important;
+                text-align: left !important;
+            }
+
+            .recognition-dot {
+                left: 20px !important;
+                right: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation (same as index) -->
+    
+    <div class="achievements-container">
+        <h1 class="page-title">Achievements & Recognition</h1>
+        
+        <div class="achievements-grid">
+            <div class="achievement-card">
+                <i class="fas fa-trophy achievement-icon"></i>
+                <h3 class="achievement-title">TryHackMe Top 4%</h3>
+                <p class="achievement-description">
+                    Ranked in the top 4% globally on TryHackMe platform with multiple completed paths and challenges.
+                </p>
+            </div>
+
+            <div class="achievement-card">
+                <i class="fas fa-bug achievement-icon"></i>
+                <h3 class="achievement-title">Critical Vulnerabilities</h3>
+                <p class="achievement-description">
+                    Discovered critical security vulnerabilities in major platforms and enterprise applications.
+                </p>
+            </div>
+
+            <div class="achievement-card">
+                <i class="fas fa-university achievement-icon"></i>
+                <h3 class="achievement-title">University Recognition</h3>
+                <p class="achievement-description">
+                    Recognized for discovering serious vulnerabilities in university systems, leading to guest lecturer opportunities.
+                </p>
+            </div>
+
+            <div class="achievement-card">
+                <i class="fas fa-code-branch achievement-icon"></i>
+                <h3 class="achievement-title">Open Source Contributor</h3>
+                <p class="achievement-description">
+                    Created UniShot toolkit and contributed to various security projects on GitHub.
+                </p>
+            </div>
+
+            <div class="achievement-card">
+                <i class="fas fa-user-secret achievement-icon"></i>
+                <h3 class="achievement-title">Private Bug Bounties</h3>
+                <p class="achievement-description">
+                    Active participant in multiple private bug bounty programs with successful submissions.
+                </p>
+            </div>
+
+            <div class="achievement-card">
+                <i class="fas fa-chalkboard-teacher achievement-icon"></i>
+                <h3 class="achievement-title">Security Educator</h3>
+                <p class="achievement-description">
+                    Delivered cybersecurity lectures and workshops at university level.
+                </p>
+            </div>
+        </div>
+
+        <div class="stats-section">
+            <h2 class="section-title">Impact Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">50+</div>
+                    <div class="stat-label">Vulnerabilities Found</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">10+</div>
+                    <div class="stat-label">Critical CVEs</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">15+</div>
+                    <div class="stat-label">Certifications</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100+</div>
+                    <div class="stat-label">Security Tools Used</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="certifications-section">
+            <h2 class="section-title">Certifications</h2>
+            <div class="cert-showcase">
+                <div class="cert-card">
+                    <div class="cert-logo">
+                        <i class="fas fa-certificate"></i>
+                    </div>
+                    <h3 class="cert-name">eJPT</h3>
+                    <p class="cert-issuer">eLearnSecurity</p>
+                    <p class="cert-date">Junior Penetration Tester</p>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-logo">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="cert-name">Red Team Course</h3>
+                    <p class="cert-issuer">Udemy</p>
+                    <p class="cert-date">Advanced Red Teaming Techniques</p>
+                </div>
+
+                <div class="cert-card">
+                    <div class="cert-logo">
+                        <i class="fas fa-flag"></i>
+                    </div>
+                    <h3 class="cert-name">TryHackMe Paths</h3>
+                    <p class="cert-issuer">TryHackMe</p>
+                    <p class="cert-date">Multiple Learning Paths Completed</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="recognition-section">
+            <h2 class="section-title">Recognition Timeline</h2>
+            <div class="recognition-timeline">
+                <div class="recognition-item">
+                    <div class="recognition-dot"></div>
+                    <div class="recognition-content">
+                        <h3 class="recognition-title">2024 - Bug Bounty Elite</h3>
+                        <p class="recognition-description">
+                            Joined exclusive private bug bounty programs and discovered high-impact vulnerabilities.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="recognition-item">
+                    <div class="recognition-dot"></div>
+                    <div class="recognition-content">
+                        <h3 class="recognition-title">2023 - University Security Award</h3>
+                        <p class="recognition-description">
+                            Received special recognition for responsible disclosure of critical university system vulnerabilities.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="recognition-item">
+                    <div class="recognition-dot"></div>
+                    <div class="recognition-content">
+                        <h3 class="recognition-title">2023 - Tool Developer</h3>
+                        <p class="recognition-description">
+                            Released UniShot toolkit gaining recognition in the security community.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="recognition-item">
+                    <div class="recognition-dot"></div>
+                    <div class="recognition-content">
+                        <h3 class="recognition-title">2022 - TryHackMe Achievement</h3>
+                        <p class="recognition-description">
+                            Reached top 4% global ranking on TryHackMe platform.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include scripts -->
+</body>
+</html>
