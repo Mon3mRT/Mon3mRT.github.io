@@ -1,209 +1,432 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mon3m | Cybersecurity Enthusiast</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>mon3m - Cybersecurity Red Teamer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Basic Reset & Body Styling */
-        body {
-            font-family: 'Roboto', sans-serif;
+        * {
             margin: 0;
             padding: 0;
-            background-color: #1a1a2e; /* Dark Blue */
-            color: #e0e0e0; /* Light Gray */
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #00ff41;
+            --secondary-color: #ff0040;
+            --bg-dark: #0a0a0a;
+            --bg-medium: #1a1a1a;
+            --bg-light: #2a2a2a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
             line-height: 1.6;
-            direction: ltr; /* Left-to-right for English */
-            text-align: left;
+            overflow-x: hidden;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 20px;
-            background-color: #16213e; /* Slightly Lighter Dark Blue */
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        /* Terminal Cursor Animation */
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
         }
 
-        /* Header Styling */
-        header {
-            text-align: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #0f3460; /* Darker Blue Separator */
-            margin-bottom: 30px;
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: var(--primary-color);
+            animation: blink 1s infinite;
+            vertical-align: text-bottom;
         }
 
-        header h1 {
-            color: #e94560; /* Reddish Pink Accent */
-            font-size: 2.8em;
-            margin-bottom: 5px;
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--primary-color);
         }
 
-        header p {
-            color: #b0b0b0;
-            font-size: 1.2em;
-            margin-top: 0;
-        }
-
-        /* Section Styling */
-        section {
-            margin-bottom: 40px;
-            padding-bottom: 20px;
-            border-bottom: 1px dashed #0f3460;
-        }
-
-        section:last-of-type {
-            border-bottom: none;
-        }
-
-        section h2 {
-            color: #533483; /* Purple Accent */
-            font-size: 1.8em;
-            border-left: 4px solid #e94560; /* Reddish Pink Accent */
-            padding-left: 10px;
-            margin-bottom: 20px;
-        }
-
-        /* List Styling (Skills, Achievements) */
-        ul {
+        nav ul {
             list-style: none;
-            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 2rem;
         }
 
-        ul li {
-            background-color: #0f3460; /* Dark Blue for list items */
-            margin-bottom: 10px;
-            padding: 12px 15px;
-            border-radius: 5px;
+        nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        nav a:hover {
+            color: var(--primary-color);
+        }
+
+        nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--primary-color);
+            transition: width 0.3s;
+        }
+
+        nav a:hover::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            font-size: 1.1em;
+            justify-content: center;
+            position: relative;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
         }
 
-        ul li::before {
-            content: "•"; /* Bullet point */
-            color: #e94560; /* Reddish Pink */
-            font-size: 1.5em;
-            margin-right: 10px; /* Space between bullet and text */
-        }
-
-        /* Project Styling */
-        .project-card {
-            background-color: #0f3460;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .project-card h3 {
-            color: #e94560;
-            font-size: 1.5em;
-            margin-bottom: 5px;
-        }
-
-        .project-card p {
-            font-size: 1em;
-            color: #c0c0c0;
-        }
-
-        .project-card a {
-            color: #533483;
-            text-decoration: none;
-            font-weight: bold;
-            transition: color 0.3s ease;
-        }
-
-        .project-card a:hover {
-            color: #e94560;
-        }
-
-        /* Contact Styling */
-        .contact-info a {
-            color: #e94560;
-            text-decoration: none;
-            margin-right: 15px;
-            font-size: 1.1em;
-            transition: color 0.3s ease;
-        }
-
-        .contact-info a:hover {
-            color: #533483;
-        }
-
-        /* Footer Styling */
-        footer {
+        .hero-content {
             text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #0f3460;
-            color: #b0b0b0;
-            font-size: 0.9em;
+            z-index: 1;
+        }
+
+        .glitch {
+            font-size: 4rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            position: relative;
+            color: var(--text-primary);
+            letter-spacing: 5px;
+            animation: glitch 2s infinite;
+        }
+
+        @keyframes glitch {
+            0%, 100% {
+                text-shadow: 
+                    0.05em 0 0 var(--secondary-color),
+                    -0.05em -0.025em 0 var(--primary-color),
+                    0.025em 0.05em 0 var(--secondary-color);
+            }
+            15% {
+                text-shadow: 
+                    0.05em 0 0 var(--secondary-color),
+                    -0.05em -0.025em 0 var(--primary-color),
+                    -0.025em 0.05em 0 var(--secondary-color);
+            }
+        }
+
+        .tagline {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            color: var(--primary-color);
+        }
+
+        .terminal-text {
+            font-family: 'Courier New', monospace;
+            color: var(--primary-color);
+            margin: 2rem 0;
+        }
+
+        /* About Section */
+        .section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title::before {
+            content: '> ';
+            color: var(--secondary-color);
+        }
+
+        .about-content {
+            background-color: var(--bg-medium);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.3);
+        }
+
+        /* Skills Grid */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .skill-card {
+            background-color: var(--bg-light);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+
+        .skill-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 65, 0.3);
+        }
+
+        .skill-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .skill-list {
+            list-style: none;
+        }
+
+        .skill-list li::before {
+            content: '→ ';
+            color: var(--secondary-color);
+        }
+
+        /* Achievements */
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .achievement-card {
+            background-color: var(--bg-medium);
+            padding: 2rem;
+            border-radius: 10px;
+            border: 1px solid var(--secondary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .achievement-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+            border-radius: 10px;
+        }
+
+        .achievement-card:hover::before {
+            opacity: 1;
+        }
+
+        .achievement-card:hover {
+            background-color: var(--bg-dark);
+        }
+
+        /* Projects */
+        .project-showcase {
+            background-color: var(--bg-medium);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-top: 2rem;
+            border: 1px solid var(--primary-color);
+        }
+
+        .project-title {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .tech-tag {
+            background-color: var(--bg-light);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid var(--primary-color);
+        }
+
+        /* Contact Section */
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .contact-links a {
+            font-size: 2rem;
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+
+        .contact-links a:hover {
+            color: var(--primary-color);
+            transform: scale(1.2);
+        }
+
+        /* Matrix Rain Effect */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+            z-index: 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .glitch {
+                font-size: 2.5rem;
+            }
+            
+            nav ul {
+                gap: 1rem;
+                font-size: 0.9rem;
+            }
+
+            .section {
+                padding: 3rem 1rem;
+            }
+        }
+
+        /* Typing Animation */
+        .typing-animation {
+            overflow: hidden;
+            border-right: 2px solid var(--primary-color);
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), cursor-blink 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes cursor-blink {
+            from, to { border-color: transparent }
+            50% { border-color: var(--primary-color) }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Mohamed Mon3m</h1>
-            <p>Cybersecurity Enthusiast | Red Teamer | Bug Bounty Hunter</p>
-        </header>
+    <!-- Matrix Background -->
+    <canvas class="matrix-bg" id="matrix"></canvas>
 
-        <section id="about">
-            <h2>About Me</h2>
-            <p>Hello! I'm Mon3m, a passionate cybersecurity enthusiast with a strong focus on Red Teaming, Web Security, and Bug Bounty hunting. I've been actively involved in the cybersecurity field for nearly a year and have already discovered several critical vulnerabilities in well-known platforms.</p>
-            <p>My main motivation isn’t to exploit systems, but rather to help secure them, raise awareness, and improve digital safety. I'm always learning, collaborating, and pushing myself forward—not to break things, but to build a safer digital world.</p>
-        </section>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Skills</a></li>
+            <li><a href="#achievements">Achievements</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
 
-        <section id="skills">
-            <h2>My Skills</h2>
-            <ul>
-                <li>Red Teaming & Penetration Testing</li>
-                <li>Web Application Security</li>
-                <li>Bug Bounty Hunting</li>
-                <li>Vulnerability Assessment</li>
-                <li>Security Tool Development (Python)</li>
-                <li>OSINT (Open Source Intelligence)</li>
-            </ul>
-        </section>
-
-        <section id="achievements">
-            <h2>Achievements & Projects</h2>
-            <ul>
-                <li><strong>Critical Vulnerability Discoveries:</strong> Successfully identified critical Blind SSRF vulnerabilities in major platforms including Facebook, LinkedIn, Twitter, and Instagram, responsibly reporting most findings.</li>
-                <li><strong>TryHackMe Ranking:</strong> Currently ranked among the top 4% on TryHackMe.</li>
-                <li><strong>Certifications:</strong> Completed eJPT (unofficial) and a comprehensive Red Teaming course on Udemy.</li>
-                <li><strong>University Recognition:</strong> Officially recognized by my university for responsibly disclosing critical vulnerabilities and invited to give cybersecurity lectures.</li>
-            </ul>
-
-            <div class="project-card">
-                <h3>UniShot - Open-Source Project</h3>
-                <p>UniShot is an open-source project I maintain on GitHub, dedicated to building and sharing advanced security tools.</p>
-                <p>One of the key tools I've developed is <strong>UniCrack</strong>, a specialized tool for JWT (JSON Web Tokens) security testing.</p>
-                <a href="https://github.com/Mon3mRT/UniShot" target="_blank">Visit UniShot Project on GitHub</a>
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="glitch">mon3m</h1>
+            <p class="tagline">Red Teamer | Security Researcher | Tool Developer</p>
+            <div class="terminal-text">
+                <p class="typing-animation">$ Exploiting vulnerabilities, securing the future_</p>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <section id="goals">
-            <h2>My Goals</h2>
-            <p>My goal is to become one of the top professionals in the cybersecurity field and eventually start my own cybersecurity company. I am dedicated to continuous learning and collaboration to contribute to a more secure digital world.</p>
-        </section>
+    <!-- About Section -->
+    <section id="about" class="section">
+        <h2 class="section-title">About Me</h2>
+        <div class="about-content">
+            <p>Cybersecurity enthusiast and Red Teamer with extensive experience in web, mobile, cloud, and OS hacking. I've discovered critical vulnerabilities in major platforms and consistently push the boundaries of security testing.</p>
+            <br>
+            <p>My journey includes achieving top 4% global ranking on TryHackMe, earning multiple certifications, and developing innovative security tools. I've been recognized by my university for discovering serious vulnerabilities in their systems, leading to opportunities to deliver cybersecurity lectures.</p>
+            <br>
+            <p>Currently focused on advancing my skills in cloud hacking, mobile security, OS exploitation, and preparing to dive deep into IoT hacking. I'm actively engaged in private bug bounty programs and continuously work on enhancing my security profile.</p>
+        </div>
+    </section>
 
-        <section id="contact" class="contact-info">
-            <h2>Connect With Me</h2>
-            <p>Feel free to reach out for collaborations or discussions on cybersecurity.</p>
-            <a href="mailto:your_email@example.com">Email</a> |
-            <a href="https://github.com/Mon3mRT" target="_blank">GitHub</a> |
-            <a href="https://www.linkedin.com/in/your_linkedin_profile" target="_blank">LinkedIn</a>
-            </section>
-    </div>
+    <!-- Skills Section -->
+    <section id="skills" class="section">
+        <h2 class="section-title">Technical Arsenal</h2>
+        <div class="skills-grid">
+            <div class="skill-card">
+                <h3><i class="fas fa-code"></i> Programming Languages</h3>
+                <ul class="skill-list">
+                    <li>Python</li>
+                    <li>Bash</li>
+                    <li>JavaScript</li>
+                    <li>C++</li>
+                    <li>Java</li>
+                </ul>
+            </div>
+            <div class="skill-card">
+                <h3><i class="fas fa-tools"></i> Security Tools</h3>
+                <ul class="skill-list">
+                    <li>Burp Suite</li>
+                    <li>Nuclei</li>
+                    <li>FFUF</li>
+                    <li>SQLmap</li>
+                    <li>Acunetix</li>
+                </ul>
+            </div>
+            <div class="skill-card">
+                <h3><i class="fas fa-shield-alt"></i> Specializations</h3>
+                <ul class="skill-list">
+                    <li>Web Application Security</li>
+                    <li>Mobile Security</li>
+                    <li>Cloud Security</li>
+                    <li>OS Exploitation</li>
+                    <li>Red Team Operations</li>
+                </ul>
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        <p>&copy; 2025 Mon3m. All rights reserved.</p>
-    </footer>
-</body>
-</html>
+    <!-- Achievements Section -->
+    <section id="achievements" class="section">
+        <h2 class="section-title">Achievements</h2>
+        <div class="achievements-grid">
+            <div class="achievement-card">
+                <h3><i class="fas fa-certificate"></i> Certifications</h3>
+                <p>eJPT Certified</p>
+                <p>Re
