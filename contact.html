@@ -999,12 +999,10 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loader" id="loader">
         <div class="loader-text">CONNECTING...</div>
     </div>
 
-    <!-- Background Elements -->
     <div class="bg-animation"></div>
     <div class="geometric-bg">
         <div class="geo-shape"></div>
@@ -1013,7 +1011,6 @@
     </div>
     <div class="connection-lines" id="connectionLines"></div>
 
-    <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">MON3M</a>
@@ -1093,6 +1090,35 @@
                 </div>
             </div>
 
+            <div class="contact-form">
+                <h2 class="form-title">Send Message</h2>
+                <form id="contactForm">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="subject">Subject</label>
+                        <input type="text" id="subject" class="form-control" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="message">Message</label>
+                        <textarea id="message" class="form-control" required></textarea>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                </form>
+            </div>
+        </div>
 
         <div class="availability-status">
             <div class="status-indicator">
@@ -1110,7 +1136,6 @@
         </div>
     </div>
 
-    <!-- Social Links -->
     <div class="social-links">
         <a href="https://github.com/UniShotProject" class="social-link" target="_blank">
             <i class="fab fa-github"></i>
@@ -1126,7 +1151,6 @@
         </a>
     </div>
 
-    <!-- Floating Action Button -->
     <div class="fab-container">
         <div class="fab" id="fabButton">
             <i class="fas fa-comment-dots"></i>
