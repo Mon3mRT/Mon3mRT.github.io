@@ -429,4 +429,220 @@
             <div class="achievement-card">
                 <h3><i class="fas fa-certificate"></i> Certifications</h3>
                 <p>eJPT Certified</p>
-                <p>Re
+                <p>Red Teaming Course - Udemy</p>
+                <p>Multiple TryHackMe Certificates</p>
+            </div>
+            <div class="achievement-card">
+                <h3><i class="fas fa-trophy"></i> Rankings & Recognition</h3>
+                <p>Top 4% Globally on TryHackMe</p>
+                <p>University Security Recognition</p>
+                <p>Cybersecurity Lecturer</p>
+            </div>
+            <div class="achievement-card">
+                <h3><i class="fas fa-bug"></i> Bug Bounties</h3>
+                <p>Critical Vulnerabilities in Major Platforms</p>
+                <p>University System Vulnerabilities</p>
+                <p>Active in Private Bug Bounty Programs</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="section">
+        <h2 class="section-title">Featured Projects</h2>
+        <div class="project-showcase">
+            <h3 class="project-title"><i class="fab fa-github"></i> UniShot</h3>
+            <p class="project-description">A comprehensive security testing toolkit featuring advanced tools for modern penetration testing and vulnerability assessment.</p>
+            
+            <h4 style="color: var(--primary-color); margin-top: 1.5rem;">UniCrack - JWT Testing Tool</h4>
+            <p class="project-description">Advanced JWT testing tool with features including:</p>
+            <ul style="margin-left: 2rem; color: var(--text-secondary);">
+                <li>Brute force capabilities</li>
+                <li>RS/HS confusion attacks</li>
+                <li>Nested JWT support</li>
+                <li>Custom payload injection</li>
+                <li>Automated vulnerability detection</li>
+            </ul>
+            
+            <div class="tech-stack">
+                <span class="tech-tag">Python</span>
+                <span class="tech-tag">Cryptography</span>
+                <span class="tech-tag">JWT</span>
+                <span class="tech-tag">Security Testing</span>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <a href="https://github.com/mon3m/UniShot" target="_blank" style="color: var(--primary-color); text-decoration: none;">
+                    <i class="fab fa-github"></i> View on GitHub →
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="section">
+        <h2 class="section-title">Connect</h2>
+        <div class="about-content" style="text-align: center;">
+            <p>Ready to collaborate on security projects or discuss the latest in cybersecurity?</p>
+            <p style="color: var(--primary-color); margin-top: 1rem;">Let's connect and build a more secure digital world together.</p>
+            
+            <div class="contact-links">
+                <a href="https://github.com/mon3m" target="_blank" title="GitHub">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="https://linkedin.com/in/mon3m" target="_blank" title="LinkedIn">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="https://twitter.com/mon3m" target="_blank" title="Twitter">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="mailto:contact@mon3m.com" title="Email">
+                    <i class="fas fa-envelope"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; border-top: 1px solid var(--primary-color); color: var(--text-secondary);">
+        <p>&copy; 2024 mon3m | <span style="color: var(--primary-color);">Stay Curious, Stay Secure</span></p>
+    </footer>
+
+    <script>
+        // Matrix Rain Effect
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+        const matrixArray = matrix.split("");
+
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#00ff41';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(draw, 35);
+
+        // Smooth Scrolling
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Dynamic Text Effects
+        const dynamicTexts = [
+            "Exploiting vulnerabilities, securing the future",
+            "Breaking systems to build better ones",
+            "Red Team mindset, Blue Team results",
+            "Security is not a product, but a process"
+        ];
+
+        let textIndex = 0;
+        const typingElement = document.querySelector('.typing-animation');
+
+        function changeText() {
+            textIndex = (textIndex + 1) % dynamicTexts.length;
+            typingElement.textContent = `$ ${dynamicTexts[textIndex]}_`;
+            typingElement.style.animation = 'none';
+            setTimeout(() => {
+                typingElement.style.animation = 'typing 3s steps(40, end), cursor-blink 0.75s step-end infinite';
+            }, 10);
+        }
+
+        setInterval(changeText, 5000);
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Add glitch effect to random elements periodically
+        const glitchElements = document.querySelectorAll('.skill-card h3, .achievement-card h3');
+        
+        setInterval(() => {
+            const randomElement = glitchElements[Math.floor(Math.random() * glitchElements.length)];
+            randomElement.style.animation = 'glitch 0.3s';
+            setTimeout(() => {
+                randomElement.style.animation = '';
+            }, 300);
+        }, 3000);
+
+        // Terminal command simulation in console
+        console.log('%c[+] mon3m Security Terminal v1.0', 'color: #00ff41; font-size: 20px;');
+        console.log('%c[*] Initializing security protocols...', 'color: #00ff41;');
+        console.log('%c[✓] Portfolio loaded successfully', 'color: #00ff41;');
+        console.log('%c[!] Warning: This console is monitored for security purposes', 'color: #ff0040;');
+        console.log('%c[>] Type "help" for available commands', 'color: #00ff41;');
+
+        // Easter egg for console
+        window.help = function() {
+            console.log('%cAvailable Commands:', 'color: #00ff41; font-weight: bold;');
+            console.log('%c  whoami     - Display user information', 'color: #00ff41;');
+            console.log('%c  skills     - List technical skills', 'color: #00ff41;');
+            console.log('%c  projects   - Show current projects', 'color: #00ff41;');
+            console.log('%c  contact    - Get contact information', 'color: #00ff41;');
+            return 'Happy hacking! 🚀';
+        };
+
+        window.whoami = function() {
+            return 'mon3m - Red Teamer | Security Researcher | Tool Developer';
+        };
+
+        window.skills = function() {
+            return {
+                languages: ['Python', 'Bash', 'JavaScript', 'C++', 'Java'],
+                tools: ['Burp Suite', 'Nuclei', 'FFUF', 'SQLmap', 'Acunetix'],
+                specializations: ['Web Security', 'Mobile Security', 'Cloud Security', 'Red Teaming']
+            };
+        };
+
+        window.projects = function() {
+            return {
+                UniShot: 'Security testing toolkit with UniCrack JWT tool',
+                status: 'Active development',
+                github: 'https://github.com/mon3m/UniShot'
+            };
+        };
+
+        window.contact = function() {
+            return {
+                github: 'https://github.com/mon3m',
+                message: 'Feel free to reach out for security collaborations!'
+            };
+        };
+    </script>
+</body>
+</html>
