@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vulnerabilities - mon3m</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-green: #00ff88;
+            --neon-pink: #ff0066;
+            --neon-blue: #00ffff;
+            --neon-purple: #9d4edd;
+            --neon-orange: #ff6b35;
+            --neon-yellow: #ffdd00;
+            --neon-red: #ff3333;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --text-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -3;
+            background: linear-gradient(45deg, #0a0a0a, #1a0a0a, #0a1a1a, #1a1a0a);
+            background-size: 400% 400%;
+            animation: gradientShift 20s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Matrix Background */
+        .matrix-bg {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            opacity: 0.05;
+        }
+
+        /* Glitch Lines */
+        .glitch-lines {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+            opacity: 0.1;
+        }
+
+        .glitch-line {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: var(--neon-red);
+            animation: glitchMove 5s infinite linear;
+        }
+
+        @keyframes glitchMove {
+            0% { transform: translateY(0) scaleX(1); }
+            50% { transform: translateY(100vh) scaleX(0.5); }
+            100% { transform: translateY(0) scaleX(1); }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        nav.scrolled {
+            padding: 15px 50px;
+            background: rgba(10, 10, 10, 0.95);
+            box-shadow: 0 5px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: neonPulse 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { 
+                filter: brightness(1) drop-shadow(0 0 10px var(--neon-green)); 
+            }
+            50% { 
+                filter: brightness(1.5) drop-shadow(0 0 20px var(--neon-green)); 
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .menu-line {
+            width: 30px;
+            height: 3px;
+            background: var(--neon-green);
+            transition: all 0.3s ease;
+        }
+
+        /* Vulnerabilities Container */
+        .vulnerabilities-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 150px 20px 100px;
+        }
+
+        /* Page Title */
+        .page-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            animation: glitchTitle 2s infinite;
+        }
+
+        @keyframes glitchTitle {
+            0%, 100% {
+                text-shadow: 
+                    2px 2px 0 var(--neon-red),
+                    -2px -2px 0 var(--neon-blue),
+                    0 0 30px var(--neon-green);
+            }
+            25% {
+                text-shadow: 
+                    -2px 2px 0 var(--neon-blue),
+                    2px -2px 0 var(--neon-red),
+                    0 0 30px var(--neon-red);
+            }
+            50% {
+                text-shadow: 
+                    2px -2px 0 var(--neon-green),
+                    -2px 2px 0 var(--neon-red),
+                    0 0 30px var(--neon-blue);
+            }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.5rem;
+            background: linear-gradient(90deg, var(--neon-red), var(--neon-orange), var(--neon-yellow));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 60px;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(255, 102, 0, 0.1));
+            border: 2px solid var(--neon-red);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: statPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes statPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--neon-red);
+            animation: countUp 2s ease-out;
+        }
+
+        .stat-label {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 10px;
+        }
+
+        /* Severity Filters */
+        .severity-filters {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 12px 30px;
+            border: 2px solid;
+            border-radius: 30px;
+            background: transparent;
+            color: var(--text-white);
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .filter-btn.critical {
+            border-color: var(--neon-red);
+        }
+
+        .filter-btn.high {
+            border-color: var(--neon-orange);
+        }
+
+        .filter-btn.medium {
+            border-color: var(--neon-yellow);
+        }
+
+        .filter-btn.low {
+            border-color: var(--neon-blue);
+        }
+
+        .filter-btn.all {
+            border-color: var(--neon-green);
+        }
+
+        .filter-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .filter-btn.critical::before { background: var(--neon-red); }
+        .filter-btn.high::before { background: var(--neon-orange); }
+        .filter-btn.medium::before { background: var(--neon-yellow); }
+        .filter-btn.low::before { background: var(--neon-blue); }
+        .filter-btn.all::before { background: var(--neon-green); }
+
+        .filter-btn:hover::before {
+            left: 0;
+        }
+
+        .filter-btn:hover {
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+        }
+
+        .filter-btn.active {
+            color: var(--dark-bg);
+        }
+
+        .filter-btn.active::before {
+            left: 0;
+        }
+
+        /* Vulnerabilities Grid */
+        .vulnerabilities-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+        }
+
+        .vulnerability-card {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.9));
+            border: 2px solid transparent;
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            animation: cardFadeIn 0.8s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--card-index) * 0.1s);
+        }
+
+        @keyframes cardFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .vulnerability-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--severity-color), transparent);
+            border-radius: 20px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .vulnerability-card:hover::before {
+            opacity: 1;
+        }
+
+        .vulnerability-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(255, 0, 0, 0.3);
+        }
+
+        .vuln-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .vuln-title {
+            font-size: 1.5rem;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .severity-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            animation: badgePulse 2s infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .severity-critical {
+            background: var(--neon-red);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-red);
+        }
+
+        .severity-high {
+            background: var(--neon-orange);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-orange);
+        }
+
+        .severity-medium {
+            background: var(--neon-yellow);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-yellow);
+        }
+
+        .severity-low {
+            background: var(--neon-blue);
+            color: var(--dark-bg);
+            box-shadow: 0 0 20px var(--neon-blue);
+        }
+
+        .vuln-company {
+            font-size: 1.1rem;
+            color: var(--neon-blue);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .vuln-company i {
+            font-size: 1.3rem;
+        }
+
+        .vuln-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .vuln-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .detail-item i {
+            color: var(--neon-green);
+        }
+
+        .vuln-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--neon-green);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            color: var(--neon-green);
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: var(--neon-green);
+            color: var(--dark-bg);
+            transform: scale(1.1);
+        }
+
+        /* CVE Section */
+        .cve-section {
+            margin-top: 80px;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.05), rgba(255, 102, 0, 0.05));
+            border: 2px solid rgba(255, 0, 0, 0.3);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cve-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 0, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        .cve-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 40px;
+            color: var(--neon-red);
+            font-family: 'Orbitron', sans-serif;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cve-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cve-item {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--neon-red);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .cve-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(255, 0, 0, 0.4);
+        }
+
+        .cve-number {
+            font-size: 1.5rem;
+            color: var(--neon-red);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .cve-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--neon-orange);
+            text-shadow: 0 0 20px var(--neon-orange);
+        }
+
+        /* Hall of Fame */
+        .hall-of-fame {
+            margin-top: 80px;
+            text-align: center;
+        }
+
+        .hof-title {
+            font-size: 2.5rem;
+            color: var(--neon-yellow);
+            margin-bottom: 40px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            animation: goldShine 3s linear infinite;
+        }
+
+        @keyframes goldShine {
+            0%, 100% { text-shadow: 0 0 20px var(--neon-yellow); }
+            50% { text-shadow: 0 0 40px var(--neon-yellow), 0 0 60px var(--neon-orange); }
+        }
+
+        .companies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .company-card {
+            background: rgba(20, 20, 20, 0.8);
+            border: 2px solid var(--neon-yellow);
+            border-radius: 20px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .company-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 221, 0, 0.2) 0%, transparent 70%);
+            transform: rotate(0deg);
+            transition: transform 0.5s ease;
+        }
+
+        .company-card:hover::before {
+            transform: rotate(180deg);
+        }
+
+        .company-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 221, 0, 0.4);
+        }
+
+        .company-icon {
+            font-size: 3rem;
+            color: var(--neon-yellow);
+            margin-bottom: 15px;
+        }
+
+        .company-name {
+            font-size: 1.3rem;
+            color: var(--text-white);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .company-vulns {
+            color: var(--neon-green);
+            font-size: 1.1rem;
+        }
+
+        /* Social Links */
+        .social-links {
+            position: fixed;
+            left: 50px;
+            bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 100;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--neon-green);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .social-link i {
+            font-size: 1.5rem;
+            color: var(--text-white);
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+            border-color: var(--neon-green);
+        }
+
+        .social-link:hover i {
+            color: var(--dark-bg);
+            transform: rotate(360deg);
+        }
+
+        /* Floating Alert */
+        .security-alert {
+            position: fixed;
+            top: 100px;
+            right: 50px;
+            background: linear-gradient(135deg, var(--neon-red), var(--neon-orange));
+            color: var(--text-white);
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-weight: bold;
+            animation: alertFloat 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(255, 0, 0, 0.5);
+            z-index: 100;
+            cursor: pointer;
+        }
+
+        @keyframes alertFloat {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.05); }
+        }
+
+        .security-alert i {
+            margin-right: 10px;
+            animation: alertBlink 1s infinite;
+        }
+
+        @keyframes alertBlink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(10, 10, 10, 0.98);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .mobile-menu.active .menu-line:nth-child(1) {
+                transform: rotate(45deg) translate(8px, 8px);
+            }
+
+            .mobile-menu.active .menu-line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .mobile-menu.active .menu-line:nth-child(3) {
+                transform: rotate(-45deg) translate(8px, -8px);
+            }
+
+            .vulnerabilities-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .social-links {
+                left: 20px;
+                bottom: 20px;
+                flex-direction: row;
+                gap: 15px;
+            }
+
+            .security-alert {
+                right: 20px;
+                font-size: 0.9rem;
+                padding: 10px 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            font-size: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-red);
+            text-shadow: 0 0 20px var(--neon-red);
+            animation: loaderPulse 1s infinite;
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-text">LOADING VULNERABILITIES...</div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="bg-animation"></div>
+    <canvas class="matrix-bg" id="matrixBg"></canvas>
+    <div class="glitch-lines" id="glitchLines"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">MON3M</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="achievements.html">Achievements</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="vulnerabilities.html">Vulnerabilities</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="mobile-menu" id="mobileMenu">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Security Alert -->
+    <div class="security-alert" onclick="showSecurityInfo()">
+        <i class="fas fa-exclamation-triangle"></i>
+        Responsible Disclosure
+    </div>
+    
+    <div class="vulnerabilities-container">
+        <h1 class="page-title">DISCOVERED VULNERABILITIES</h1>
+        <p class="subtitle">Breaking Systems to Build Better Security</p>
+        
+        <!-- Stats Overview -->
+        <div class="stats-overview">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">Total Vulnerabilities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15</div>
+                <div class="stat-label">Critical Findings</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">10+</div>
+                <div class="stat-label">CVEs Assigned</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">25+</div>
+                <div class="stat-label">Companies Secured</div>
+            </div>
+        </div>
+
+        <!-- Severity Filters -->
+        <div class="severity-filters">
+            <button class="filter-btn all active" onclick="filterVulns('all')">All</button>
+            <button class="filter-btn critical" onclick="filterVulns('critical')">Critical</button>
+            <button class="filter-btn high" onclick="filterVulns('high')">High</button>
+            <button class="filter-btn medium" onclick="filterVulns('medium')">Medium</button>
+            <button class="filter-btn low" onclick="filterVulns('low')">Low</button>
+        </div>
+
+        <!-- Vulnerabilities Grid -->
+        <div class="vulnerabilities-grid">
+            <div class="vulnerability-card" data-severity="critical" style="--card-index: 0; --severity-color: var(--neon-red)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">Remote Code Execution</h3>
+                    <span class="severity-badge severity-critical">Critical</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-building"></i>
+                    Major E-commerce Platform
+                </div>
+                <p class="vuln-description">
+                    Discovered a critical RCE vulnerability in the payment processing system allowing arbitrary code execution through unsanitized input fields.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>March 2024</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>$5000 Bounty</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">RCE</span>
+                    <span class="tag">Authentication Bypass</span>
+                    <span class="tag">Payment System</span>
+                </div>
+            </div>
+
+            <div class="vulnerability-card" data-severity="critical" style="--card-index: 1; --severity-color: var(--neon-red)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">SQL Injection</h3>
+                    <span class="severity-badge severity-critical">Critical</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-university"></i>
+                    University System
+                </div>
+                <p class="vuln-description">
+                    Critical SQL injection in student portal allowing complete database access and modification of grades, personal data, and administrative functions.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>January 2024</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-award"></i>
+                        <span>Recognition Award</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">SQLi</span>
+                    <span class="tag">Database</span>
+                    <span class="tag">Education</span>
+                </div>
+            </div>
+
+            <div class="vulnerability-card" data-severity="high" style="--card-index: 2; --severity-color: var(--neon-orange)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">JWT Token Forgery</h3>
+                    <span class="severity-badge severity-high">High</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-mobile-alt"></i>
+                    Mobile Banking App
+                </div>
+                <p class="vuln-description">
+                    JWT implementation flaw allowing token forgery and privilege escalation to admin accounts through algorithm confusion attack.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>February 2024</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>$3000 Bounty</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">JWT</span>
+                    <span class="tag">Authentication</span>
+                    <span class="tag">Mobile</span>
+                </div>
+            </div>
+
+            <div class="vulnerability-card" data-severity="high" style="--card-index: 3; --severity-color: var(--neon-orange)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">IDOR to PII Access</h3>
+                    <span class="severity-badge severity-high">High</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-heartbeat"></i>
+                    Healthcare Platform
+                </div>
+                <p class="vuln-description">
+                    Insecure Direct Object Reference vulnerability exposing patient medical records and personal health information through API endpoints.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>December 2023</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>$4000 Bounty</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">IDOR</span>
+                    <span class="tag">API</span>
+                    <span class="tag">Healthcare</span>
+                </div>
+            </div>
+
+            <div class="vulnerability-card" data-severity="medium" style="--card-index: 4; --severity-color: var(--neon-yellow)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">XSS in Admin Panel</h3>
+                    <span class="severity-badge severity-medium">Medium</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-shopping-cart"></i>
+                    E-commerce CMS
+                </div>
+                <p class="vuln-description">
+                    Stored XSS vulnerability in admin panel allowing execution of malicious JavaScript code affecting all administrators.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>November 2023</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>$1500 Bounty</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">XSS</span>
+                    <span class="tag">Admin Panel</span>
+                    <span class="tag">CMS</span>
+                </div>
+            </div>
+
+            <div class="vulnerability-card" data-severity="low" style="--card-index: 5; --severity-color: var(--neon-blue)">
+                <div class="vuln-header">
+                    <h3 class="vuln-title">Information Disclosure</h3>
+                    <span class="severity-badge severity-low">Low</span>
+                </div>
+                <div class="vuln-company">
+                    <i class="fas fa-cloud"></i>
+                    Cloud Storage Service
+                </div>
+                <p class="vuln-description">
+                    Exposed debug endpoints revealing internal server information and API keys in production environment.
+                </p>
+                <div class="vuln-details">
+                    <div class="detail-item">
+                        <i class="fas fa-calendar"></i>
+                        <span>October 2023</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-dollar-sign"></i>
+                        <span>$500 Bounty</span>
+                    </div>
+                    <div class="detail-item">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>Patched</span>
+                    </div>
+                </div>
+                <div class="vuln-tags">
+                    <span class="tag">Info Disclosure</span>
+                    <span class="tag">Debug</span>
+                    <span class="tag">Cloud</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- CVE Section -->
+        <div class="cve-section">
+            <h2 class="cve-title">Assigned CVEs</h2>
+            <div class="cve-list">
+                <div class="cve-item">
+                    <div class="cve-number">CVE-2024-1337</div>
+                    <div class="cve-score">9.8</div>
+                    <p>Critical RCE in Payment Gateway</p>
+                </div>
+                <div class="cve-item">
+                    <div class="cve-number">CVE-2024-1338</div>
+                    <div class="cve-score">8.9</div>
+                    <p>SQL Injection in Admin Portal</p>
+                </div>
+                <div class="cve-item">
+                    <div class="cve-number">CVE-2023-9999</div>
+                    <div class="cve-score">7.5</div>
+                    <p>Authentication Bypass in API</p>
+                </div>
+                <div class="cve-item">
+                    <div class="cve-number">CVE-2023-8888</div>
+                    <div class="cve-score">8.2</div>
+                    <p>IDOR to Sensitive Data</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hall of Fame -->
+        <div class="hall-of-fame">
+            <h2 class="hof-title">Hall of Fame</h2>
+            <div class="companies-grid">
+                <div class="company-card">
+                    <i class="fas fa-university company-icon"></i>
+                    <div class="company-name">Universities</div>
+                    <div class="company-vulns">5 Vulnerabilities</div>
+                </div>
+                <div class="company-card">
+                    <i class="fas fa-shopping-cart company-icon"></i>
+                    <div class="company-name">E-commerce</div>
+                    <div class="company-vulns">8 Vulnerabilities</div>
+                </div>
+                <div class="company-card">
+                    <i class="fas fa-bank company-icon"></i>
+                    <div class="company-name">Banking</div>
+                    <div class="company-vulns">6 Vulnerabilities</div>
+                </div>
+                <div class="company-card">
+                    <i class="fas fa-heartbeat company-icon"></i>
+                    <div class="company-name">Healthcare</div>
+                    <div class="company-vulns">4 Vulnerabilities</div>
+                </div>
+                <div class="company-card">
+                    <i class="fas fa-cloud company-icon"></i>
+                    <div class="company-name">Cloud Services</div>
+                    <div class="company-vulns">7 Vulnerabilities</div>
+                </div>
+                <div class="company-card">
+                    <i class="fas fa-mobile-alt company-icon"></i>
+                    <div class="company-name">Mobile Apps</div>
+                    <div class="company-vulns">9 Vulnerabilities</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Social Links -->
+    <div class="social-links">
+        <a href="https://github.com/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://twitter.com/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-twitter"></i>
+        </a>
+        <a href="mailto:contact@mon3m.com" class="social-link">
+            <i class="fas fa-envelope"></i>
+        </a>
+    </div>
+
+    <script>
+        // Loading Screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Matrix Background Effect
+        const canvas = document.getElementById('matrixBg');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const matrix = "ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789@#$%^&*()*&^%+-/~{[|`]}";
+        const matrixArray = matrix.split("");
+
+        const fontSize = 10;
+        const columns = canvas.width / fontSize;
+
+        const drops = [];
+        for(let x = 0; x < columns; x++) {
+            drops[x] = Math.random() * -100;
+        }
+
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#ff0066';
+            ctx.font = fontSize + 'px monospace';
+
+            for(let i = 0; i < drops.length; i++) {
+                const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if(drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        setInterval(drawMatrix, 35);
+
+        // Glitch Lines
+        function createGlitchLine() {
+            const container = document.getElementById('glitchLines');
+            const line = document.createElement('div');
+            line.classList.add('glitch-line');
+            line.style.top = Math.random() * window.innerHeight + 'px';
+            line.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            line.style.opacity = Math.random() * 0.5 + 0.1;
+            
+            container.appendChild(line);
+            
+            setTimeout(() => {
+                line.remove();
+            }, 5000);
+        }
+
+        setInterval(createGlitchLine, 2000);
+
+        // Filter Vulnerabilities
+        function filterVulns(severity) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            const cards = document.querySelectorAll('.vulnerability-card');
+            
+            // Update active button
+            buttons.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.classList.contains(severity)) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Filter cards
+            cards.forEach((card, index) => {
+                if (severity === 'all' || card.dataset.severity === severity) {
+                    card.style.display = 'block';
+                    card.style.animationDelay = `${index * 0.1}s`;
+                    card.style.animation = 'none';
+                    setTimeout(() => {
+                        card.style.animation = 'cardFadeIn 0.8s ease-out forwards';
+                    }, 10);
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // Show Security Info
+        function showSecurityInfo() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(30, 30, 30, 0.98));
+                border: 2px solid var(--neon-red);
+                border-radius: 20px;
+                padding: 40px;
+                max-width: 500px;
+                z-index: 10001;
+                box-shadow: 0 20px 60px rgba(255, 0, 0, 0.5);
+                animation: modalSlideIn 0.3s ease-out;
+            `;
+            
+            modal.innerHTML = `
+                <h2 style="color: var(--neon-red); margin-bottom: 20px; font-family: 'Orbitron', sans-serif;">Responsible Disclosure Policy</h2>
+                <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.8; margin-bottom: 15px;">
+                    All vulnerabilities displayed here have been responsibly disclosed to the affected organizations and have been patched before public disclosure.
+                </p>
+                <p style="color: rgba(255, 255, 255, 0.9); line-height: 1.8; margin-bottom: 20px;">
+                    I follow strict ethical guidelines and never exploit vulnerabilities for personal gain beyond approved bug bounty programs.
+                </p>
+                <button onclick="this.parentElement.remove()" style="background: var(--neon-red); color: var(--dark-bg); border: none; padding: 10px 30px; border-radius: 20px; font-weight: bold; cursor: pointer; font-size: 1.1rem;">
+                    <i class="fas fa-check"></i> I Understand
+                </button>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+
+        // Add modal animation
+        const modalStyle = document.createElement('style');
+        modalStyle.textContent = `
+            @keyframes modalSlideIn {
+                from {
+                    opacity: 0;
+                    transform: translate(-50%, -50%) scale(0.8);
+                }
+                to {
+                    opacity: 1;
+                    transform: translate(-50%, -50%) scale(1);
+                }
+            }
+        `;
+        document.head.appendChild(modalStyle);
+
+        // Animate stats on scroll
+        const observerOptions = {
+            threshold: 0.5,
+            rootMargin: '0px'
+        };
+
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumber = entry.target.querySelector('.stat-number');
+                    const finalValue = parseInt(statNumber.textContent);
+                    let currentValue = 0;
+                    
+                    const increment = finalValue / 50;
+                    const timer = setInterval(() => {
+                        currentValue += increment;
+                        if (currentValue >= finalValue) {
+                            currentValue = finalValue;
+                            clearInterval(timer);
+                        }
+                        statNumber.textContent = Math.floor(currentValue) + '+';
+                    }, 30);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card').forEach(card => {
+            statsObserver.observe(card);
+        });
+
+        // Vulnerability card click effect
+        document.querySelectorAll('.vulnerability-card').forEach(card => {
+            card.addEventListener('click', function() {
+                // Create explosion effect
+                const rect = this.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                
+                for (let i = 0; i < 20; i++) {
+                    const particle = document.createElement('div');
+                    particle.style.cssText = `
+                        position: fixed;
+                        width: 5px;
+                        height: 5px;
+                        background: ${this.style.getPropertyValue('--severity-color')};
+                        border-radius: 50%;
+                        pointer-events: none;
+                        z-index: 9999;
+                    `;
+                    particle.style.left = x + 'px';
+                    particle.style.top = y + 'px';
+                    document.body.appendChild(particle);
+                    
+                    const angle = (Math.PI * 2 * i) / 20;
+                    const velocity = 5 + Math.random() * 10;
+                    const vx = Math.cos(angle) * velocity;
+                    const vy = Math.sin(angle) * velocity;
+                    let posX = 0;
+                    let posY = 0;
+                    let opacity = 1;
+                    
+                    const animateParticle = () => {
+                        posX += vx;
+                        posY += vy;
+                        opacity -= 0.02;
+                        
+                        particle.style.transform = `translate(${posX}px, ${posY}px)`;
+                        particle.style.opacity = opacity;
+                        
+                        if (opacity > 0) {
+                            requestAnimationFrame(animateParticle);
+                        } else {
+                            particle.remove();
+                        }
+                    };
+                    
+                    requestAnimationFrame(animateParticle);
+                }
+            });
+        });
+
+        // CVE item hover effect
+        document.querySelectorAll('.cve-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.background = 'rgba(255, 0, 0, 0.2)';
+                this.style.transform = 'scale(1.05) rotate(-2deg)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.background = 'rgba(0, 0, 0, 0.6)';
+                this.style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+
+        // Company card click to show details
+        document.querySelectorAll('.company-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const companyName = this.querySelector('.company-name').textContent;
+                const vulnCount = this.querySelector('.company-vulns').textContent;
+                
+                const details = document.createElement('div');
+                details.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%) scale(0);
+                    background: linear-gradient(135deg, rgba(20, 20, 20, 0.98), rgba(30, 30, 30, 0.98));
+                    border: 2px solid var(--neon-yellow);
+                    border-radius: 20px;
+                    padding: 40px;
+                    z-index: 10001;
+                    box-shadow: 0 20px 60px rgba(255, 221, 0, 0.5);
+                    transition: transform 0.3s ease;
+                `;
+                
+                details.innerHTML = `
+                    <h2 style="color: var(--neon-yellow); margin-bottom: 20px; font-family: 'Orbitron', sans-serif;">${companyName}</h2>
+                    <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 20px;">${vulnCount}</p>
+                    <p style="color: var(--neon-green); margin-bottom: 20px;">All vulnerabilities were responsibly disclosed and patched.</p>
+                    <button onclick="this.parentElement.style.transform='translate(-50%, -50%) scale(0)'; setTimeout(() => this.parentElement.remove(), 300)" style="background: var(--neon-yellow); color: var(--dark-bg); border: none; padding: 10px 30px; border-radius: 20px; font-weight: bold; cursor: pointer;">
+                        Close
+                    </button>
+                `;
+                
+                document.body.appendChild(details);
+                setTimeout(() => {
+                    details.style.transform = 'translate(-50%, -50%) scale(1)';
+                }, 10);
+            });
+        });
+
+        // Console Easter Eggs
+        console.log('%c[!] SECURITY WARNING', 'color: #ff0066; font-size: 20px; font-weight: bold;');
+        console.log('%c[*] This console may contain sensitive information about vulnerabilities.', 'color: #ff0066;');
+        console.log('%c[*] All vulnerabilities shown have been responsibly disclosed and patched.', 'color: #00ff88;');
+        console.log('%c[*] Never attempt to exploit vulnerabilities without permission!', 'color: #ff0066;');
+
+        // Resize canvas on window resize
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+
+        // Add random glitch effect
+        setInterval(() => {
+            const randomCard = document.querySelectorAll('.vulnerability-card')[Math.floor(Math.random() * document.querySelectorAll('.vulnerability-card').length)];
+            if (randomCard) {
+                randomCard.style.animation = 'glitch1 0.3s';
+                setTimeout(() => {
+                    randomCard.style.animation = '';
+                }, 300);
+            }
+        }, 5000);
+
+        // Add glitch animation
+        const glitchStyle = document.createElement('style');
+        glitchStyle.textContent = `
+            @keyframes glitch1 {
+                0%, 100% { transform: translate(0); }
+                20% { transform: translate(-2px, 2px); }
+                40% { transform: translate(-2px, -2px); }
+                60% { transform: translate(2px, 2px); }
+                80% { transform: translate(2px, -2px); }
+            }
+        `;
+        document.head.appendChild(glitchStyle);
+
+        // Page visibility effect
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                // Animate severity badges when page becomes visible
+                document.querySelectorAll('.severity-badge').forEach((badge, index) => {
+                    setTimeout(() => {
+                        badge.style.animation = 'none';
+                        setTimeout(() => {
+                            badge.style.animation = 'badgePulse 2s infinite';
+                        }, 10);
+                    }, index * 100);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
