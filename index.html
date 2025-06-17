@@ -27,31 +27,6 @@
             background: var(--dark-bg);
             color: var(--text-white);
             overflow-x: hidden;
-            cursor: none;
-        }
-
-        /* Custom Cursor */
-        .cursor {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--neon-green);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            transition: all 0.1s ease;
-            z-index: 9999;
-            mix-blend-mode: difference;
-        }
-
-        .cursor-follower {
-            width: 40px;
-            height: 40px;
-            background: rgba(0, 255, 136, 0.1);
-            border-radius: 50%;
-            position: fixed;
-            pointer-events: none;
-            transition: all 0.3s ease;
-            z-index: 9998;
         }
 
         /* Animated Background */
@@ -584,6 +559,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            text-decoration: none;
         }
 
         .social-link::before {
@@ -772,10 +748,6 @@
         <div class="loader-text">INITIALIZING...</div>
     </div>
 
-    <!-- Custom Cursor -->
-    <div class="cursor"></div>
-    <div class="cursor-follower"></div>
-
     <!-- Background Elements -->
     <div class="bg-animation"></div>
     <div class="cyber-grid"></div>
@@ -829,7 +801,7 @@
         <div class="about-card">
             <p class="about-text">
                 I'm <span class="highlight">mon3m</span>, a passionate <span class="highlight">Cyber Security Expert</span> and <span class="highlight">Red Teamer</span> 
-                 with expertise in web, mobile, cloud, and OS hacking. I've discovered <span class="highlight">critical vulnerabilities</span> 
+                with expertise in web, mobile, cloud, and OS hacking. I've discovered <span class="highlight">critical vulnerabilities</span> 
                 in major platforms and continuously push the boundaries of security testing. My mission is to make the digital world safer 
                 by thinking like an attacker and building innovative security solutions.
             </p>
@@ -858,36 +830,6 @@
             setTimeout(() => {
                 document.getElementById('loader').classList.add('hidden');
             }, 1500);
-        });
-
-        // Custom Cursor
-        const cursor = document.querySelector('.cursor');
-        const cursorFollower = document.querySelector('.cursor-follower');
-
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            
-            setTimeout(() => {
-                cursorFollower.style.left = e.clientX - 10 + 'px';
-                cursorFollower.style.top = e.clientY - 10 + 'px';
-            }, 100);
-        });
-
-        // Cursor hover effects
-        const hoverElements = document.querySelectorAll('a, button, .social-link, .cta-btn');
-        hoverElements.forEach(elem => {
-            elem.addEventListener('mouseenter', () => {
-                cursor.style.transform = 'scale(2)';
-                cursor.style.borderColor = 'var(--neon-pink)';
-                cursorFollower.style.transform = 'scale(1.5)';
-            });
-            
-            elem.addEventListener('mouseleave', () => {
-                cursor.style.transform = 'scale(1)';
-                cursor.style.borderColor = 'var(--neon-green)';
-                cursorFollower.style.transform = 'scale(1)';
-            });
         });
 
         // Typing Animation
@@ -1053,6 +995,90 @@
             }
         `;
         document.head.appendChild(style);
+
+        // Console Easter Eggs
+        console.log('%c[+] mon3m Security Terminal v1.0', 'color: #00ff88; font-size: 20px; font-weight: bold;');
+        console.log('%c[*] Initializing security protocols...', 'color: #00ff88;');
+        console.log('%c[✓] Portfolio loaded successfully', 'color: #00ff88;');
+        console.log('%c[!] Warning: This console is monitored for security purposes', 'color: #ff0066;');
+        console.log('%c[>] Type "help()" for available commands', 'color: #00ff88;');
+
+        // Easter egg commands
+        window.help = function() {
+            console.log('%cAvailable Commands:', 'color: #00ff88; font-weight: bold;');
+            console.log('%c  whoami()     - Display user information', 'color: #00ff88;');
+            console.log('%c  skills()     - List technical skills', 'color: #00ff88;');
+            console.log('%c  projects()   - Show current projects', 'color: #00ff88;');
+            console.log('%c  contact()    - Get contact information', 'color: #00ff88;');
+            console.log('%c  hack()       - ???', 'color: #00ff88;');
+            return 'Happy hacking! 🚀';
+        };
+
+        window.whoami = function() {
+            return {
+                name: 'mon3m',
+                role: 'Red Teamer | Security Researcher | Tool Developer',
+                rank: 'TryHackMe Top 4% Global',
+                motto: 'Breaking systems to build better ones'
+            };
+        };
+
+        window.skills = function() {
+            return {
+                languages: ['Python', 'Bash', 'JavaScript', 'C++', 'Java'],
+                tools: ['Burp Suite', 'Nuclei', 'FFUF', 'SQLmap', 'Acunetix', 'Metasploit', 'Cobalt Strike'],
+                specializations: ['Web Security', 'Mobile Security', 'Cloud Security', 'Red Teaming', 'Exploit Development']
+            };
+        };
+
+        window.projects = function() {
+            return {
+                UniShot: {
+                    description: 'Security testing toolkit with UniCrack JWT tool',
+                    features: ['JWT Testing', 'Brute Force', 'RS/HS Confusion', 'Nested JWT Support'],
+                    status: 'Active development',
+                    github: 'https://github.com/mon3m/UniShot'
+                }
+            };
+        };
+
+        window.contact = function() {
+            return {
+                github: 'https://github.com/mon3m',
+                email: 'contact@mon3m.com',
+                message: 'Feel free to reach out for security collaborations!'
+            };
+        };
+
+        window.hack = function() {
+            console.log('%c[!] Initiating hack sequence...', 'color: #ff0066; font-size: 16px;');
+            setTimeout(() => {
+                console.log('%c[+] Access granted!', 'color: #00ff88; font-size: 16px;');
+                console.log('%c[*] Just kidding! But nice try 😉', 'color: #00ffff; font-size: 16px;');
+                console.log('%c[>] Want to learn real hacking? Check out my projects!', 'color: #00ff88; font-size: 16px;');
+            }, 2000);
+            return 'Processing...';
+        };
+
+        // Add glitch effect on hover to certain elements
+        const glitchElements = document.querySelectorAll('.highlight, .cta-btn');
+        glitchElements.forEach(elem => {
+            elem.addEventListener('mouseenter', function() {
+                this.style.animation = 'glitch1 0.3s infinite';
+            });
+            elem.addEventListener('mouseleave', function() {
+                this.style.animation = '';
+            });
+        });
+
+        // Add random glitch to title
+        setInterval(() => {
+            const title = document.querySelector('.hero-title');
+            title.style.animation = 'none';
+            setTimeout(() => {
+                title.style.animation = 'glitchAnim 3s infinite';
+            }, 100);
+        }, 10000);
     </script>
 </body>
 </html>
