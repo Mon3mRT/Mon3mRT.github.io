@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - mon3m</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Copy all the common styles from index.html here */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-green: #00ff88;
+            --neon-pink: #ff0066;
+            --neon-blue: #00ffff;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --text-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            overflow-x: hidden;
+            cursor: none;
+        }
+
+        /* Include all common styles from index.html */
+        /* Navigation, cursor, background animations, etc. */
+
+        /* About Page Specific Styles */
+        .about-hero {
+            padding: 150px 20px 100px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 10px;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleGlow 3s ease-in-out infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 20px var(--neon-green)); }
+            50% { filter: brightness(1.5) drop-shadow(0 0 40px var(--neon-blue)); }
+        }
+
+        .about-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .story-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: center;
+            margin-bottom: 100px;
+        }
+
+        .story-text {
+            background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.9));
+            padding: 40px;
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-text::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .story-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--neon-green);
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .story-text p {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+            z-index: 1;
+        }
+
+        .skills-visual {
+            background: rgba(0, 255, 136, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .skill-bar {
+            position: relative;
+        }
+
+        .skill-bar h3 {
+            margin-bottom: 10px;
+            color: var(--neon-blue);
+        }
+
+        .skill-progress {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .skill-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+            border-radius: 10px;
+            animation: fillBar 2s ease-out forwards;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .skill-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes fillBar {
+             from { width: 0; }
+            to { width: var(--skill-level); }
+        }
+
+        @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .timeline {
+            margin: 100px 0;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-green), var(--neon-blue));
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .timeline-item {
+            position: relative;
+            width: 50%;
+            padding: 40px;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .timeline-item:nth-child(odd) {
+            left: 0;
+            text-align: right;
+            padding-right: 60px;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            padding-left: 60px;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            top: 50px;
+            box-shadow: 0 0 20px var(--neon-green);
+            animation: pulseDot 2s infinite;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-dot {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even) .timeline-dot {
+            left: -10px;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px var(--neon-green); }
+            50% { transform: scale(1.2); box-shadow: 0 0 40px var(--neon-green); }
+        }
+
+        .timeline-content {
+            background: rgba(20, 20, 20, 0.9);
+            padding: 30px;
+            border-radius: 20px;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-content:hover {
+            transform: scale(1.05);
+            box-shadow: 0 20px 40px rgba(0, 255, 136, 0.3);
+            border-color: var(--neon-green);
+        }
+
+        .timeline-date {
+            font-size: 1.5rem;
+            color: var(--neon-blue);
+            font-family: 'Orbitron', sans-serif;
+            margin-bottom: 10px;
+        }
+
+        .timeline-title {
+            font-size: 1.8rem;
+            color: var(--neon-green);
+            margin-bottom: 10px;
+        }
+
+        .timeline-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .story-section {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 30px;
+            }
+
+            .timeline-item {
+                width: 100%;
+                left: 0 !important;
+                padding-left: 80px !important;
+                padding-right: 20px !important;
+                text-align: left !important;
+            }
+
+            .timeline-dot {
+                left: 20px !important;
+                right: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Copy navigation and common elements from index.html -->
+    
+    <section class="about-hero">
+        <h1 class="page-title">About Me</h1>
+        <p class="hero-subtitle">The Journey of a Cyber Security Expert</p>
+    </section>
+
+    <div class="about-content">
+        <div class="story-section">
+            <div class="story-text">
+                <h2>My Story</h2>
+                <p>
+                    As a passionate cybersecurity enthusiast and Red Teamer, I've dedicated my career to understanding and securing digital systems. 
+                    With extensive experience in web, mobile, cloud, and OS hacking, I've discovered critical vulnerabilities in major platforms 
+                    and helped organizations strengthen their security posture.
+                </p>
+                <br>
+                <p>
+                    My journey includes achieving top 4% global ranking on TryHackMe, earning the eJPT certification, and creating innovative 
+                    security tools like UniShot. I believe in the philosophy of "breaking systems to build better ones" and continuously 
+                    push the boundaries of what's possible in security testing.
+                </p>
+            </div>
+            <div class="skills-visual">
+                <div class="skill-bar">
+                    <h3>Web Application Security</h3>
+                    <div class="skill-progress">
+                        <div class="skill-fill" style="--skill-level: 95%"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <h3>Mobile Security</h3>
+                    <div class="skill-progress">
+                        <div class="skill-fill" style="--skill-level: 85%"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <h3>Cloud Security</h3>
+                    <div class="skill-progress">
+                        <div class="skill-fill" style="--skill-level: 80%"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <h3>OS Exploitation</h3>
+                    <div class="skill-progress">
+                        <div class="skill-fill" style="--skill-level: 88%"></div>
+                    </div>
+                </div>
+                <div class="skill-bar">
+                    <h3>Red Team Operations</h3>
+                    <div class="skill-progress">
+                        <div class="skill-fill" style="--skill-level: 90%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2024</div>
+                    <div class="timeline-title">Private Bug Bounties</div>
+                    <div class="timeline-description">
+                        Joined multiple private bug bounty programs and discovered critical vulnerabilities in enterprise applications.
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-title">University Recognition</div>
+                    <div class="timeline-description">
+                        Discovered serious vulnerabilities in university systems, leading to recognition and opportunities to deliver cybersecurity lectures.
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2023</div>
+                    <div class="timeline-title">UniShot Project</div>
+                    <div class="timeline-description">
+                        Created UniShot toolkit including UniCrack - an advanced JWT testing tool supporting brute force, RS/HS confusion, and nested JWTs.
+                    </div>
+                </div>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <div class="timeline-date">2022</div>
+                    <div class="timeline-title">eJPT Certification</div>
+                    <div class="timeline-description">
+                        Earned the eJPT certification and completed advanced Red Teaming courses, solidifying my expertise in penetration testing.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include common scripts from index.html -->
+    <script>
+        // Copy all necessary scripts from index.html
+    </script>
+</body>
+</html>
