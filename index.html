@@ -1,1 +1,209 @@
-test
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon3m | Cybersecurity Enthusiast</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic Reset & Body Styling */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #1a1a2e; /* Dark Blue */
+            color: #e0e0e0; /* Light Gray */
+            line-height: 1.6;
+            direction: ltr; /* Left-to-right for English */
+            text-align: left;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background-color: #16213e; /* Slightly Lighter Dark Blue */
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Header Styling */
+        header {
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #0f3460; /* Darker Blue Separator */
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: #e94560; /* Reddish Pink Accent */
+            font-size: 2.8em;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            color: #b0b0b0;
+            font-size: 1.2em;
+            margin-top: 0;
+        }
+
+        /* Section Styling */
+        section {
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #0f3460;
+        }
+
+        section:last-of-type {
+            border-bottom: none;
+        }
+
+        section h2 {
+            color: #533483; /* Purple Accent */
+            font-size: 1.8em;
+            border-left: 4px solid #e94560; /* Reddish Pink Accent */
+            padding-left: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* List Styling (Skills, Achievements) */
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #0f3460; /* Dark Blue for list items */
+            margin-bottom: 10px;
+            padding: 12px 15px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+        }
+
+        ul li::before {
+            content: "•"; /* Bullet point */
+            color: #e94560; /* Reddish Pink */
+            font-size: 1.5em;
+            margin-right: 10px; /* Space between bullet and text */
+        }
+
+        /* Project Styling */
+        .project-card {
+            background-color: #0f3460;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .project-card h3 {
+            color: #e94560;
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .project-card p {
+            font-size: 1em;
+            color: #c0c0c0;
+        }
+
+        .project-card a {
+            color: #533483;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+
+        .project-card a:hover {
+            color: #e94560;
+        }
+
+        /* Contact Styling */
+        .contact-info a {
+            color: #e94560;
+            text-decoration: none;
+            margin-right: 15px;
+            font-size: 1.1em;
+            transition: color 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            color: #533483;
+        }
+
+        /* Footer Styling */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #0f3460;
+            color: #b0b0b0;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Mohamed Mon3m</h1>
+            <p>Cybersecurity Enthusiast | Red Teamer | Bug Bounty Hunter</p>
+        </header>
+
+        <section id="about">
+            <h2>About Me</h2>
+            <p>Hello! I'm Mon3m, a passionate cybersecurity enthusiast with a strong focus on Red Teaming, Web Security, and Bug Bounty hunting. I've been actively involved in the cybersecurity field for nearly a year and have already discovered several critical vulnerabilities in well-known platforms.</p>
+            <p>My main motivation isn’t to exploit systems, but rather to help secure them, raise awareness, and improve digital safety. I'm always learning, collaborating, and pushing myself forward—not to break things, but to build a safer digital world.</p>
+        </section>
+
+        <section id="skills">
+            <h2>My Skills</h2>
+            <ul>
+                <li>Red Teaming & Penetration Testing</li>
+                <li>Web Application Security</li>
+                <li>Bug Bounty Hunting</li>
+                <li>Vulnerability Assessment</li>
+                <li>Security Tool Development (Python)</li>
+                <li>OSINT (Open Source Intelligence)</li>
+            </ul>
+        </section>
+
+        <section id="achievements">
+            <h2>Achievements & Projects</h2>
+            <ul>
+                <li><strong>Critical Vulnerability Discoveries:</strong> Successfully identified critical Blind SSRF vulnerabilities in major platforms including Facebook, LinkedIn, Twitter, and Instagram, responsibly reporting most findings.</li>
+                <li><strong>TryHackMe Ranking:</strong> Currently ranked among the top 4% on TryHackMe.</li>
+                <li><strong>Certifications:</strong> Completed eJPT (unofficial) and a comprehensive Red Teaming course on Udemy.</li>
+                <li><strong>University Recognition:</strong> Officially recognized by my university for responsibly disclosing critical vulnerabilities and invited to give cybersecurity lectures.</li>
+            </ul>
+
+            <div class="project-card">
+                <h3>UniShot - Open-Source Project</h3>
+                <p>UniShot is an open-source project I maintain on GitHub, dedicated to building and sharing advanced security tools.</p>
+                <p>One of the key tools I've developed is <strong>UniCrack</strong>, a specialized tool for JWT (JSON Web Tokens) security testing.</p>
+                <a href="https://github.com/Mon3mRT/UniShot" target="_blank">Visit UniShot Project on GitHub</a>
+            </div>
+        </section>
+
+        <section id="goals">
+            <h2>My Goals</h2>
+            <p>My goal is to become one of the top professionals in the cybersecurity field and eventually start my own cybersecurity company. I am dedicated to continuous learning and collaboration to contribute to a more secure digital world.</p>
+        </section>
+
+        <section id="contact" class="contact-info">
+            <h2>Connect With Me</h2>
+            <p>Feel free to reach out for collaborations or discussions on cybersecurity.</p>
+            <a href="mailto:your_email@example.com">Email</a> |
+            <a href="https://github.com/Mon3mRT" target="_blank">GitHub</a> |
+            <a href="https://www.linkedin.com/in/your_linkedin_profile" target="_blank">LinkedIn</a>
+            </section>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Mon3m. All rights reserved.</p>
+    </footer>
+</body>
+</html>
