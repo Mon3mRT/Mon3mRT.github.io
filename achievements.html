@@ -7,14 +7,277 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        /* Include common styles */
-        /* Achievements Page Specific Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --neon-green: #00ff88;
+            --neon-pink: #ff0066;
+            --neon-blue: #00ffff;
+            --neon-purple: #9d4edd;
+            --neon-orange: #ff6b35;
+            --neon-yellow: #ffdd00;
+            --dark-bg: #0a0a0a;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --text-white: #ffffff;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: var(--dark-bg);
+            color: var(--text-white);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -3;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 0, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            animation: bgFloat 20s ease-in-out infinite;
+        }
+
+        @keyframes bgFloat {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(-20px, -20px) rotate(120deg); }
+            66% { transform: translate(20px, -10px) rotate(240deg); }
+        }
+
+        /* Particle System */
+        .particles-container {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--neon-green);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--neon-green);
+            opacity: 0;
+            animation: particleFloat 15s infinite linear;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                opacity: 0;
+                transform: translateY(100vh) scale(0);
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) scale(1);
+            }
+            90% {
+                opacity: 1;
+                transform: translateY(10vh) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(0) scale(0);
+            }
+        }
+
+        /* Trophy Rain Effect */
+        .trophy-rain {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .trophy {
+            position: absolute;
+            font-size: 20px;
+            color: var(--neon-yellow);
+            opacity: 0.1;
+            animation: trophyFall 10s infinite linear;
+        }
+
+        @keyframes trophyFall {
+            from {
+                transform: translateY(-100px) rotate(0deg);
+            }
+            to {
+                transform: translateY(100vh) rotate(360deg);
+            }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 20px 50px;
+            background: rgba(10, 10, 10, 0.3);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(0, 255, 136, 0.2);
+        }
+
+        nav.scrolled {
+            padding: 15px 50px;
+            background: rgba(10, 10, 10, 0.95);
+            box-shadow: 0 5px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 900;
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: neonPulse 2s ease-in-out infinite;
+            text-decoration: none;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { 
+                filter: brightness(1) drop-shadow(0 0 10px var(--neon-green)); 
+            }
+            50% { 
+                filter: brightness(1.5) drop-shadow(0 0 20px var(--neon-green)); 
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 40px;
+        }
+
+        .nav-links a {
+            color: var(--text-white);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 5px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-links a::before {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::before {
+            width: 100%;
+        }
+
+        .nav-links a:hover {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px var(--neon-green);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .menu-line {
+            width: 30px;
+            height: 3px;
+            background: var(--neon-green);
+            transition: all 0.3s ease;
+        }
+
+        /* Achievements Container */
         .achievements-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 150px 20px 100px;
         }
 
+        /* Page Title */
+        .page-title {
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-align: center;
+            letter-spacing: 10px;
+            margin-bottom: 20px;
+            position: relative;
+            background: linear-gradient(45deg, var(--neon-yellow), var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: titleShine 3s linear infinite, titleFloat 4s ease-in-out infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes titleShine {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+
+        @keyframes titleFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .subtitle {
+            text-align: center;
+            font-size: 1.5rem;
+            color: var(--neon-pink);
+            margin-bottom: 60px;
+            animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Achievements Grid */
         .achievements-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -24,55 +287,88 @@
 
         .achievement-card {
             background: linear-gradient(135deg, rgba(20, 20, 20, 0.9), rgba(30, 30, 30, 0.9));
-            border: 2px solid rgba(0, 255, 136, 0.3);
+            border: 2px solid transparent;
             border-radius: 20px;
             padding: 40px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
-            animation: fadeInScale 0.8s ease-out;
+            transition: all 0.4s ease;
+            animation: cardReveal 0.8s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--card-index) * 0.1s);
+            cursor: pointer;
         }
 
-        @keyframes fadeInScale {
+        @keyframes cardReveal {
             from {
                 opacity: 0;
-                transform: scale(0.8);
+                transform: translateY(50px) rotateX(-10deg);
             }
             to {
                 opacity: 1;
-                transform: scale(1);
+                transform: translateY(0) rotateX(0);
             }
         }
 
         .achievement-card::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: conic-gradient(
+                from 0deg,
+                transparent,
+                var(--neon-green),
+                var(--neon-blue),
+                var(--neon-pink),
+                transparent
+            );
+            animation: cardSpin 6s linear infinite;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        @keyframes cardSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .achievement-card:hover::before {
+            opacity: 0.2;
         }
 
         .achievement-card:hover {
-            transform: translateY(-10px);
+            transform: translateY(-10px) scale(1.05);
             box-shadow: 0 20px 40px rgba(0, 255, 136, 0.4);
             border-color: var(--neon-green);
         }
 
         .achievement-icon {
             font-size: 4rem;
-            color: var(--neon-green);
             margin-bottom: 20px;
             display: inline-block;
-            animation: bounce 2s ease-in-out infinite;
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: iconBounce 2s ease-in-out infinite;
+            animation-delay: calc(var(--card-index) * 0.2s);
         }
 
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
+        @keyframes iconBounce {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-10px) scale(1.1); }
+        }
+
+        .achievement-card:hover .achievement-icon {
+            animation: iconSpin 0.6s ease-in-out;
+        }
+
+        @keyframes iconSpin {
+            from { transform: rotate(0deg) scale(1); }
+            to { transform: rotate(360deg) scale(1.2); }
         }
 
         .achievement-title {
@@ -81,22 +377,42 @@
             margin-bottom: 15px;
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .achievement-description {
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.9);
             line-height: 1.6;
             position: relative;
             z-index: 1;
         }
 
+        /* Stats Section */
         .stats-section {
             margin-top: 100px;
-            background: rgba(0, 255, 136, 0.05);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(0, 255, 255, 0.05));
             border: 2px solid rgba(0, 255, 136, 0.3);
             border-radius: 30px;
             padding: 60px;
             text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stats-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            animation: rotate 30s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .stats-grid {
@@ -104,25 +420,50 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 40px;
             margin-top: 40px;
+            position: relative;
+            z-index: 1;
         }
 
         .stat-item {
             position: relative;
+            animation: statPop 0.8s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--stat-index) * 0.2s);
+        }
+
+        @keyframes statPop {
+            from {
+                opacity: 0;
+                transform: scale(0.5) rotate(-10deg);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
         }
 
         .stat-number {
             font-size: 4rem;
             font-weight: 900;
             font-family: 'Orbitron', sans-serif;
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            animation: countUp 2s ease-out;
+            animation: numberCount 2s ease-out forwards;
+            background-size: 200% 200%;
         }
 
-        @keyframes countUp {
-            from { opacity: 0; transform: scale(0.5); }
-            to { opacity: 1; transform: scale(1); }
+        @keyframes numberCount {
+            from { 
+                opacity: 0; 
+                transform: scale(0.5);
+                filter: blur(10px);
+            }
+            to { 
+                opacity: 1; 
+                transform: scale(1);
+                filter: blur(0);
+            }
         }
 
         .stat-label {
@@ -133,6 +474,7 @@
             letter-spacing: 2px;
         }
 
+        /* Certifications Section */
         .certifications-section {
             margin-top: 100px;
         }
@@ -151,7 +493,22 @@
             padding: 30px;
             position: relative;
             overflow: hidden;
-            transition: all 0.3s ease;
+            transition: all 0.4s ease;
+            transform-style: preserve-3d;
+            animation: certFloat 0.8s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--cert-index) * 0.15s);
+        }
+
+        @keyframes certFloat {
+            from {
+                opacity: 0;
+                transform: translateY(30px) rotateY(-20deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
         }
 
         .cert-card::after {
@@ -161,12 +518,25 @@
             left: -2px;
             right: -2px;
             bottom: -2px;
-            background: linear-gradient(45deg, var(--neon-green), var(--neon-blue), var(--neon-pink));
+            background: linear-gradient(45deg, 
+                var(--neon-green), 
+                var(--neon-blue), 
+                var(--neon-pink),
+                var(--neon-purple),
+                var(--neon-green)
+            );
             z-index: -1;
             opacity: 0;
             transition: opacity 0.3s ease;
             border-radius: 20px;
             animation: borderGradient 3s linear infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes borderGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
         .cert-card:hover::after {
@@ -174,21 +544,34 @@
         }
 
         .cert-card:hover {
-            transform: scale(1.05);
+            transform: scale(1.05) rotateY(5deg);
             background: rgba(10, 10, 10, 0.9);
+            box-shadow: 0 20px 40px rgba(0, 255, 255, 0.4);
         }
 
         .cert-logo {
             width: 80px;
             height: 80px;
-            background: var(--neon-blue);
+            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             margin: 0 auto 20px;
             font-size: 2.5rem;
-            color: var(--dark-bg);
+            color: var(--text-white);
+            animation: logoPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes logoPulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 40px rgba(0, 255, 255, 0.8);
+            }
         }
 
         .cert-name {
@@ -208,6 +591,7 @@
             font-size: 0.9rem;
         }
 
+        /* Recognition Timeline */
         .recognition-section {
             margin-top: 100px;
             text-align: center;
@@ -224,17 +608,30 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 2px;
+            width: 4px;
             height: 100%;
-            background: linear-gradient(180deg, var(--neon-green), var(--neon-blue));
+            background: linear-gradient(180deg, 
+                var(--neon-green), 
+                var(--neon-blue),
+                var(--neon-pink),
+                var(--neon-purple)
+            );
             box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+            animation: lineGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes lineGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 136, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(0, 255, 255, 0.8); }
         }
 
         .recognition-item {
             position: relative;
             padding: 30px;
             width: 50%;
-            animation: fadeInSlide 1s ease-out;
+            animation: recognitionSlide 1s ease-out forwards;
+            opacity: 0;
+            animation-delay: calc(var(--item-index) * 0.2s);
         }
 
         .recognition-item:nth-child(odd) {
@@ -248,7 +645,7 @@
             padding-left: 60px;
         }
 
-        @keyframes fadeInSlide {
+        @keyframes recognitionSlide {
             from {
                 opacity: 0;
                 transform: translateX(-50px);
@@ -267,7 +664,8 @@
             border-radius: 50%;
             top: 40px;
             box-shadow: 0 0 20px var(--neon-pink);
-            animation: pulseDot 2s infinite;
+            animation: dotPulse 2s infinite;
+            z-index: 2;
         }
 
         .recognition-item:nth-child(odd) .recognition-dot {
@@ -278,18 +676,43 @@
             left: -10px;
         }
 
+        @keyframes dotPulse {
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 20px var(--neon-pink);
+            }
+            50% { 
+                transform: scale(1.3); 
+                box-shadow: 0 0 40px var(--neon-pink);
+            }
+        }
+
         .recognition-content {
             background: rgba(20, 20, 20, 0.9);
             padding: 25px;
             border-radius: 15px;
             border: 2px solid rgba(255, 0, 102, 0.3);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .recognition-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 0, 102, 0.1) 0%, transparent 70%);
+            animation: rotate 15s linear infinite;
         }
 
         .recognition-content:hover {
             transform: scale(1.05);
             box-shadow: 0 15px 30px rgba(255, 0, 102, 0.3);
             border-color: var(--neon-pink);
+            background: rgba(10, 10, 10, 0.9);
         }
 
         .recognition-title {
@@ -297,15 +720,148 @@
             color: var(--neon-pink);
             margin-bottom: 10px;
             font-family: 'Orbitron', sans-serif;
+            position: relative;
+            z-index: 1;
         }
 
         .recognition-description {
             color: rgba(255, 255, 255, 0.8);
             line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Social Links */
+        .social-links {
+            position: fixed;
+            left: 50px;
+            bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            z-index: 100;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+
+        .social-link::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: var(--neon-green);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover::before {
+            width: 100%;
+            height: 100%;
+        }
+
+        .social-link i {
+            font-size: 1.5rem;
+            color: var(--text-white);
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: translateY(-5px) scale(1.1);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.5);
+            border-color: var(--neon-green);
+        }
+
+        .social-link:hover i {
+            color: var(--dark-bg);
+            transform: rotate(360deg);
+        }
+
+        /* Floating Badge */
+        .floating-badge {
+            position: fixed;
+            top: 150px;
+            right: 50px;
+            background: linear-gradient(135deg, var(--neon-yellow), var(--neon-orange));
+            color: var(--dark-bg);
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            animation: floatBadge 3s ease-in-out infinite;
+            box-shadow: 0 10px 30px rgba(255, 221, 0, 0.4);
+            z-index: 100;
+        }
+
+        @keyframes floatBadge {
+            0%, 100% { transform: translateY(0) rotate(-5deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
         }
 
         /* Responsive */
         @media (max-width: 768px) {
+            nav {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100vh;
+                background: rgba(10, 10, 10, 0.98);
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 30px;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: flex;
+            }
+
+            .mobile-menu.active .menu-line:nth-child(1) {
+                transform: rotate(45deg) translate(8px, 8px);
+            }
+
+            .mobile-menu.active .menu-line:nth-child(2) {
+                opacity: 0;
+            }
+
+            .mobile-menu.active .menu-line:nth-child(3) {
+                transform: rotate(-45deg) translate(8px, -8px);
+            }
+
+            .achievements-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
             .recognition-timeline::before {
                 left: 30px;
             }
@@ -322,17 +878,95 @@
                 left: 20px !important;
                 right: auto !important;
             }
+
+            .social-links {
+                left: 20px;
+                bottom: 20px;
+                flex-direction: row;
+                gap: 15px;
+            }
+
+            .floating-badge {
+                display: none;
+            }
+        }
+
+        /* Loading Animation */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--dark-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .loader-text {
+            font-size: 2rem;
+            font-family: 'Orbitron', sans-serif;
+            color: var(--neon-green);
+            text-shadow: 0 0 20px var(--neon-green);
+            animation: loaderPulse 1s infinite;
+        }
+
+        @keyframes loaderPulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation (same as index) -->
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-text">LOADING ACHIEVEMENTS...</div>
+    </div>
+
+    <!-- Background Elements -->
+    <div class="bg-animation"></div>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="trophy-rain" id="trophyRain"></div>
+
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="logo">MON3M</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="about.html">About</a></li>
+                <li><a href="skills.html">Skills</a></li>
+                <li><a href="achievements.html">Achievements</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+            <div class="mobile-menu" id="mobileMenu">
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+                <div class="menu-line"></div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Floating Badge -->
+    <div class="floating-badge">
+        <i class="fas fa-star"></i> Top Achiever
+    </div>
     
     <div class="achievements-container">
-        <h1 class="page-title">Achievements & Recognition</h1>
+        <h1 class="page-title">ACHIEVEMENTS & RECOGNITION</h1>
+        <p class="subtitle">A Journey of Excellence and Innovation</p>
         
         <div class="achievements-grid">
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 0">
                 <i class="fas fa-trophy achievement-icon"></i>
                 <h3 class="achievement-title">TryHackMe Top 4%</h3>
                 <p class="achievement-description">
@@ -340,7 +974,7 @@
                 </p>
             </div>
 
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 1">
                 <i class="fas fa-bug achievement-icon"></i>
                 <h3 class="achievement-title">Critical Vulnerabilities</h3>
                 <p class="achievement-description">
@@ -348,7 +982,7 @@
                 </p>
             </div>
 
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 2">
                 <i class="fas fa-university achievement-icon"></i>
                 <h3 class="achievement-title">University Recognition</h3>
                 <p class="achievement-description">
@@ -356,7 +990,7 @@
                 </p>
             </div>
 
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 3">
                 <i class="fas fa-code-branch achievement-icon"></i>
                 <h3 class="achievement-title">Open Source Contributor</h3>
                 <p class="achievement-description">
@@ -364,7 +998,7 @@
                 </p>
             </div>
 
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 4">
                 <i class="fas fa-user-secret achievement-icon"></i>
                 <h3 class="achievement-title">Private Bug Bounties</h3>
                 <p class="achievement-description">
@@ -372,7 +1006,7 @@
                 </p>
             </div>
 
-            <div class="achievement-card">
+            <div class="achievement-card" style="--card-index: 5">
                 <i class="fas fa-chalkboard-teacher achievement-icon"></i>
                 <h3 class="achievement-title">Security Educator</h3>
                 <p class="achievement-description">
@@ -383,20 +1017,19 @@
 
         <div class="stats-section">
             <h2 class="section-title">Impact Statistics</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
+                <div class="stat-item" style="--stat-index: 0">
                     <div class="stat-number">50+</div>
                     <div class="stat-label">Vulnerabilities Found</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" style="--stat-index: 1">
                     <div class="stat-number">10+</div>
                     <div class="stat-label">Critical CVEs</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" style="--stat-index: 2">
                     <div class="stat-number">15+</div>
                     <div class="stat-label">Certifications</div>
                 </div>
-                <div class="stat-item">
+                <div class="stat-item" style="--stat-index: 3">
                     <div class="stat-number">100+</div>
                     <div class="stat-label">Security Tools Used</div>
                 </div>
@@ -406,7 +1039,7 @@
         <div class="certifications-section">
             <h2 class="section-title">Certifications</h2>
             <div class="cert-showcase">
-                <div class="cert-card">
+                <div class="cert-card" style="--cert-index: 0">
                     <div class="cert-logo">
                         <i class="fas fa-certificate"></i>
                     </div>
@@ -415,7 +1048,7 @@
                     <p class="cert-date">Junior Penetration Tester</p>
                 </div>
 
-                <div class="cert-card">
+                <div class="cert-card" style="--cert-index: 1">
                     <div class="cert-logo">
                         <i class="fas fa-shield-alt"></i>
                     </div>
@@ -424,7 +1057,7 @@
                     <p class="cert-date">Advanced Red Teaming Techniques</p>
                 </div>
 
-                <div class="cert-card">
+                <div class="cert-card" style="--cert-index: 2">
                     <div class="cert-logo">
                         <i class="fas fa-flag"></i>
                     </div>
@@ -438,7 +1071,7 @@
         <div class="recognition-section">
             <h2 class="section-title">Recognition Timeline</h2>
             <div class="recognition-timeline">
-                <div class="recognition-item">
+                <div class="recognition-item" style="--item-index: 0">
                     <div class="recognition-dot"></div>
                     <div class="recognition-content">
                         <h3 class="recognition-title">2024 - Bug Bounty Elite</h3>
@@ -448,7 +1081,7 @@
                     </div>
                 </div>
 
-                <div class="recognition-item">
+                <div class="recognition-item" style="--item-index: 1">
                     <div class="recognition-dot"></div>
                     <div class="recognition-content">
                         <h3 class="recognition-title">2023 - University Security Award</h3>
@@ -458,7 +1091,7 @@
                     </div>
                 </div>
 
-                <div class="recognition-item">
+                <div class="recognition-item" style="--item-index: 2">
                     <div class="recognition-dot"></div>
                     <div class="recognition-content">
                         <h3 class="recognition-title">2023 - Tool Developer</h3>
@@ -468,7 +1101,7 @@
                     </div>
                 </div>
 
-                <div class="recognition-item">
+                <div class="recognition-item" style="--item-index: 3">
                     <div class="recognition-dot"></div>
                     <div class="recognition-content">
                         <h3 class="recognition-title">2022 - TryHackMe Achievement</h3>
@@ -481,6 +1114,380 @@
         </div>
     </div>
 
-    <!-- Include scripts -->
+    <!-- Social Links -->
+    <div class="social-links">
+        <a href="https://github.com/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-github"></i>
+        </a>
+        <a href="https://linkedin.com/in/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-linkedin"></i>
+        </a>
+        <a href="https://twitter.com/mon3m" class="social-link" target="_blank">
+            <i class="fab fa-twitter"></i>
+        </a>
+        <a href="mailto:contact@mon3m.com" class="social-link">
+            <i class="fas fa-envelope"></i>
+        </a>
+    </div>
+
+    <script>
+        // Loading Screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1000);
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Mobile Menu Toggle
+        const mobileMenu = document.getElementById('mobileMenu');
+        const navLinks = document.getElementById('navLinks');
+        
+        mobileMenu.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            navLinks.classList.toggle('active');
+        });
+
+        // Create Particles
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            particle.style.left = Math.random() * window.innerWidth + 'px';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particle.style.animationDelay = Math.random() * 5 + 's';
+            
+            const colors = ['var(--neon-green)', 'var(--neon-blue)', 'var(--neon-pink)', 'var(--neon-yellow)'];
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            particle.style.background = color;
+            particle.style.boxShadow = `0 0 10px ${color}`;
+            
+            document.getElementById('particlesContainer').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 15000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 500);
+
+        // Create Trophy Rain
+        function createTrophy() {
+            const trophy = document.createElement('div');
+            trophy.classList.add('trophy');
+            trophy.innerHTML = '🏆';
+            trophy.style.left = Math.random() * window.innerWidth + 'px';
+            trophy.style.animationDuration = (Math.random() * 5 + 5) + 's';
+            trophy.style.animationDelay = Math.random() * 2 + 's';
+            trophy.style.fontSize = (Math.random() * 20 + 20) + 'px';
+            
+            document.getElementById('trophyRain').appendChild(trophy);
+            
+            setTimeout(() => {
+                trophy.remove();
+            }, 10000);
+        }
+
+        // Create trophies periodically
+        setInterval(createTrophy, 3000);
+
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe achievement cards
+        document.querySelectorAll('.achievement-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Animate stat numbers
+        function animateNumber(element, target) {
+            let current = 0;
+            const increment = target / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + '+';
+            }, 30);
+        }
+
+        // Observe stat items
+        const statObserver = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && !entry.target.classList.contains('animated')) {
+                    entry.target.classList.add('animated');
+                    const number = entry.target.querySelector('.stat-number');
+                    const target = parseInt(number.textContent);
+                    animateNumber(number, target);
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-item').forEach(item => {
+            statObserver.observe(item);
+        });
+
+        // Card hover effects
+        document.querySelectorAll('.achievement-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.05) rotateY(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1) rotateY(0)';
+            });
+        });
+
+        // Parallax effect for background
+        window.addEventListener('mousemove', (e) => {
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+            
+            document.querySelector('.bg-animation').style.transform = 
+                `translate(${x * 20}px, ${y * 20}px) scale(1.1)`;
+        });
+
+        // Add random glow to certifications
+        const certCards = document.querySelectorAll('.cert-card');
+        setInterval(() => {
+            const randomCard = certCards[Math.floor(Math.random() * certCards.length)];
+            randomCard.style.boxShadow = '0 0 50px rgba(0, 255, 136, 0.6)';
+            setTimeout(() => {
+                randomCard.style.boxShadow = '';
+            }, 1000);
+        }, 2000);
+
+        // Console Easter Eggs
+        console.log('%c[+] Achievements Module Loaded', 'color: #00ff88; font-size: 16px; font-weight: bold;');
+        console.log('%c[*] Calculating impact metrics...', 'color: #00ff88;');
+        console.log('%c[✓] Total achievements: ' + document.querySelectorAll('.achievement-card').length, 'color: #00ff88;');
+        console.log('%c[🏆] Keep pushing boundaries!', 'color: #ffdd00; font-size: 14px;');
+
+        // Add floating animation to badge
+        const floatingBadge = document.querySelector('.floating-badge');
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            floatingBadge.style.transform = `translateY(${Math.sin(scrolled * 0.01) * 20}px) rotate(${Math.cos(scrolled * 0.01) * 5}deg)`;
+        });
+
+        // Create confetti on achievement card click
+        function createConfetti(x, y) {
+            for (let i = 0; i < 20; i++) {
+                const confetti = document.createElement('div');
+                confetti.style.position = 'fixed';
+                confetti.style.left = x + 'px';
+                confetti.style.top = y + 'px';
+                confetti.style.width = '10px';
+                confetti.style.height = '10px';
+                confetti.style.background = ['var(--neon-green)', 'var(--neon-blue)', 'var(--neon-pink)', 'var(--neon-yellow)'][Math.floor(Math.random() * 4)];
+                confetti.style.borderRadius = '50%';
+                confetti.style.pointerEvents = 'none';
+                confetti.style.zIndex = '9999';
+                document.body.appendChild(confetti);
+                
+                const angle = (Math.PI * 2 * i) / 20;
+                const velocity = 5 + Math.random() * 5;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity - 10;
+                let posX = 0;
+                let posY = 0;
+                let opacity = 1;
+                
+                const animateConfetti = () => {
+                    posX += vx;
+                    posY += vy + 0.5;
+                    opacity -= 0.02;
+                    
+                    confetti.style.transform = `translate(${posX}px, ${posY}px)`;
+                    confetti.style.opacity = opacity;
+                    
+                    if (opacity > 0) {
+                        requestAnimationFrame(animateConfetti);
+                    } else {
+                        confetti.remove();
+                    }
+                };
+                
+                requestAnimationFrame(animateConfetti);
+            }
+        }
+
+        // Add confetti effect on achievement card click
+        document.querySelectorAll('.achievement-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                const rect = this.getBoundingClientRect();
+                const x = rect.left + rect.width / 2;
+                const y = rect.top + rect.height / 2;
+                createConfetti(x, y);
+                
+                // Add pulse effect
+                this.style.animation = 'none';
+                setTimeout(() => {
+                    this.style.animation = 'cardReveal 0.8s ease-out forwards';
+                }, 10);
+            });
+        });
+
+        // Dynamic background gradient
+        let gradientAngle = 0;
+        setInterval(() => {
+            gradientAngle += 1;
+            document.querySelector('.bg-animation').style.background = 
+                `radial-gradient(circle at ${50 + Math.sin(gradientAngle * 0.01) * 30}% ${50 + Math.cos(gradientAngle * 0.01) * 30}%, 
+                rgba(0, 255, 136, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at ${80 - Math.sin(gradientAngle * 0.01) * 20}% ${80 - Math.cos(gradientAngle * 0.01) * 20}%, 
+                rgba(255, 0, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at ${40 + Math.cos(gradientAngle * 0.01) * 25}% ${20 + Math.sin(gradientAngle * 0.01) * 25}%, 
+                rgba(0, 255, 255, 0.1) 0%, transparent 50%)`;
+        }, 50);
+
+        // Page visibility animation
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) {
+                document.querySelectorAll('.achievement-icon').forEach((icon, index) => {
+                    setTimeout(() => {
+                        icon.style.animation = 'iconSpin 0.6s ease-in-out';
+                        setTimeout(() => {
+                            icon.style.animation = 'iconBounce 2s ease-in-out infinite';
+                        }, 600);
+                    }, index * 100);
+                });
+            }
+        });
+
+        // Add achievement sound effect (visual feedback instead of actual sound)
+        function showAchievementUnlocked() {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: -400px;
+                background: linear-gradient(135deg, var(--neon-green), var(--neon-blue));
+                color: var(--dark-bg);
+                padding: 20px 40px;
+                border-radius: 10px;
+                font-size: 1.2rem;
+                font-weight: bold;
+                font-family: 'Orbitron', sans-serif;
+                box-shadow: 0 10px 40px rgba(0, 255, 136, 0.5);
+                z-index: 10000;
+                transition: right 0.5s ease;
+            `;
+            notification.innerHTML = '<i class="fas fa-trophy"></i> Achievement Unlocked!';
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.right = '20px';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.right = '-400px';
+                setTimeout(() => {
+                    notification.remove();
+                }, 500);
+            }, 3000);
+        }
+
+        // Show achievement notification after page loads
+        setTimeout(showAchievementUnlocked, 2000);
+
+        // Interactive timeline dots
+        document.querySelectorAll('.recognition-dot').forEach(dot => {
+            dot.addEventListener('click', function() {
+                const item = this.parentElement;
+                const content = item.querySelector('.recognition-content');
+                
+                // Create ripple effect
+                const ripple = document.createElement('div');
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    border: 2px solid var(--neon-pink);
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    animation: ripple 1s ease-out;
+                `;
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 1000);
+                
+                // Highlight content
+                content.style.transform = 'scale(1.1)';
+                content.style.boxShadow = '0 20px 50px rgba(255, 0, 102, 0.5)';
+                setTimeout(() => {
+                    content.style.transform = '';
+                    content.style.boxShadow = '';
+                }, 500);
+            });
+        });
+
+        // Add ripple animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes ripple {
+                from {
+                    width: 20px;
+                    height: 20px;
+                    opacity: 1;
+                }
+                to {
+                    width: 100px;
+                    height: 100px;
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Keyboard navigation
+        let currentCard = 0;
+        const cards = document.querySelectorAll('.achievement-card');
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                currentCard = (currentCard + 1) % cards.length;
+                cards[currentCard].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cards[currentCard].style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    cards[currentCard].style.transform = '';
+                }, 300);
+            } else if (e.key === 'ArrowLeft') {
+                currentCard = (currentCard - 1 + cards.length) % cards.length;
+                cards[currentCard].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cards[currentCard].style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    cards[currentCard].style.transform = '';
+                }, 300);
+            }
+        });
+    </script>
 </body>
 </html>
