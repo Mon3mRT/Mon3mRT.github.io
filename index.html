@@ -86,6 +86,8 @@
             background: var(--neon-green);
             border-radius: 50%;
             box-shadow: 0 0 10px var(--neon-green);
+            /* Add animation for floating particles */
+            animation: float 10s infinite ease-in-out;
         }
 
         /* Navigation */
@@ -128,10 +130,10 @@
 
         @keyframes neonPulse {
             0%, 100% { 
-                filter: brightness(1) drop-shadow(0 0 10px var(--neon-green)); 
+                filter: brightness(1) drop-shadow(0 0 10px var(--neon-green));
             }
             50% { 
-                filter: brightness(1.5) drop-shadow(0 0 20px var(--neon-green)); 
+                filter: brightness(1.5) drop-shadow(0 0 20px var(--neon-green));
             }
         }
 
@@ -253,22 +255,22 @@
 
         @keyframes glitch1 {
             0%, 100% { 
-                clip-path: inset(20% 0 30% 0); 
+                clip-path: inset(20% 0 30% 0);
                 transform: translate(-3px, 3px);
             }
             50% { 
-                clip-path: inset(50% 0 10% 0); 
+                clip-path: inset(50% 0 10% 0);
                 transform: translate(3px, -3px);
             }
         }
 
         @keyframes glitch2 {
             0%, 100% { 
-                clip-path: inset(60% 0 10% 0); 
+                clip-path: inset(60% 0 10% 0);
                 transform: translate(3px, 3px);
             }
             50% { 
-                clip-path: inset(10% 0 60% 0); 
+                clip-path: inset(10% 0 60% 0);
                 transform: translate(-3px, -3px);
             }
         }
@@ -356,6 +358,7 @@
             box-shadow: 
                 0 0 20px rgba(0, 255, 136, 0.5),
                 inset 0 0 20px rgba(0, 255, 136, 0.2);
+            transition: all 0.5s ease; /* Added transition for smooth color change */
         }
 
         .cta-secondary {
@@ -363,6 +366,7 @@
             background: transparent;
             border-color: var(--neon-blue);
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transition: all 0.5s ease; /* Added transition for smooth color change */
         }
 
         .cta-btn::before {
@@ -386,6 +390,10 @@
                 0 10px 40px rgba(0, 255, 136, 0.7),
                 inset 0 0 30px rgba(0, 255, 136, 0.4);
             filter: brightness(1.2);
+            /* Optional: Change text color on hover for primary button */
+            color: var(--text-white); 
+            background: var(--neon-blue); /* Changed background color on hover */
+            border-color: var(--neon-blue); /* Changed border color on hover */
         }
 
         .cta-secondary:hover {
@@ -394,6 +402,10 @@
             box-shadow: 
                 0 10px 40px rgba(0, 255, 255, 0.7),
                 inset 0 0 30px rgba(0, 255, 255, 0.4);
+            /* Optional: Change text color on hover for secondary button */
+            color: var(--neon-green); /* Changed text color on hover */
+            background: var(--dark-bg); /* Changed background color on hover */
+            border-color: var(--neon-green); /* Changed border color on hover */
         }
 
         /* About Preview Section */
@@ -743,18 +755,15 @@
     </style>
 </head>
 <body>
-    <!-- Loading Screen -->
     <div class="loader" id="loader">
         <div class="loader-text">INITIALIZING...</div>
     </div>
 
-    <!-- Background Elements -->
     <div class="bg-animation"></div>
     <div class="cyber-grid"></div>
     <canvas class="matrix-code" id="matrix"></canvas>
     <div class="particles" id="particles"></div>
 
-    <!-- Navigation -->
     <nav id="navbar">
         <div class="nav-container">
             <a href="index.html" class="logo">MON3M</a>
@@ -774,7 +783,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
             <div class="glitch-wrapper">
@@ -795,20 +803,19 @@
         </div>
     </section>
 
-    <!-- About Preview -->
     <section class="about-preview">
         <h2 class="section-title">WHO AM I</h2>
         <div class="about-card">
             <p class="about-text">
                 I'm <span class="highlight">mon3m</span>, a <span class="highlight">Penetration Tester</span> and <span class="highlight">Red Teamer</span> 
-                with strong expertise in web application and Active Directory exploitation. I've discovered  
+                with strong expertise in web application and Active Directory exploitation.
+                I've discovered  
                 <span class="highlight">critical vulnerabilities</span> in major platforms and continuously strive to find more weaknesses and expand my knowledge.
                 My mission is to make the digital world safer by thinking like an attacker and developing innovative security solutions.
             </p>
         </div>
     </section>
 
-    <!-- Social Links -->
     <div class="social-links">
         <a href="https://github.com/UniShotProject" class="social-link" target="_blank">
             <i class="fab fa-github"></i>
@@ -839,7 +846,6 @@
             "Security is not a product, but a process",
             "Exploiting vulnerabilities, securing the future"
         ];
-        
         let phraseIndex = 0;
         let charIndex = 0;
         let isDeleting = false;
@@ -888,7 +894,6 @@
         // Mobile Menu Toggle
         const mobileMenu = document.getElementById('mobileMenu');
         const navLinks = document.getElementById('navLinks');
-        
         mobileMenu.addEventListener('click', () => {
             mobileMenu.classList.toggle('active');
             navLinks.classList.toggle('active');
@@ -919,7 +924,6 @@
         // Matrix Code Effect
         const canvas = document.getElementById('matrix');
         const ctx = canvas.getContext('2d');
-
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
@@ -940,7 +944,6 @@
 
             ctx.fillStyle = '#00ff88';
             ctx.font = fontSize + 'px monospace';
-
             for(let i = 0; i < drops.length; i++) {
                 const text = matrixArray[Math.floor(Math.random() * matrixArray.length)];
                 ctx.fillText(text, i * fontSize, drops[i] * fontSize);
@@ -1013,7 +1016,6 @@
             console.log('%c  hack()       - ???', 'color: #00ff88;');
             return 'Happy hacking! 🚀';
         };
-
         window.whoami = function() {
             return {
                 name: 'mon3m',
@@ -1060,25 +1062,29 @@
             return 'Processing...';
         };
 
-        // Add glitch effect on hover to certain elements
-        const glitchElements = document.querySelectorAll('.highlight, .cta-btn');
-        glitchElements.forEach(elem => {
-            elem.addEventListener('mouseenter', function() {
-                this.style.animation = 'glitch1 0.3s infinite';
+        // Removed glitch effect on hover from .cta-btn and .highlight elements
+        // The previous code block was:
+        /*
+        const glitchElements = document.querySelectorAll('.highlight, .cta-btn'); 
+        glitchElements.forEach(elem => { 
+            elem.addEventListener('mouseenter', function() { 
+                this.style.animation = 'glitch1 0.3s infinite'; 
             });
-            elem.addEventListener('mouseleave', function() {
-                this.style.animation = '';
+            elem.addEventListener('mouseleave', function() { 
+                this.style.animation = ''; 
             });
         });
+        */
+        // This entire block has been removed to stop the glitch on hover.
 
-        // Add random glitch to title
+        // Add random glitch to title (remains unchanged as per request) 
         setInterval(() => {
-            const title = document.querySelector('.hero-title');
-            title.style.animation = 'none';
-            setTimeout(() => {
-                title.style.animation = 'glitchAnim 3s infinite';
+            const title = document.querySelector('.hero-title'); [cite: 218]
+            title.style.animation = 'none'; [cite: 218]
+            setTimeout(() => { [cite: 218]
+                title.style.animation = 'glitchAnim 3s infinite'; [cite: 218]
             }, 100);
-        }, 10000);
+        }, 10000); [cite: 218]
     </script>
 </body>
 </html>
