@@ -633,7 +633,7 @@
                 { origin: null, description: 'JavaScript null value' },
                 { origin: '', description: 'Empty string' },
                 { origin: ' ', description: 'Space character' },
-                { origin: '\x00', description: 'Null byte' },
+                { origin: String.fromCharCode(0), description: 'Null byte' },
                 { origin: 'data:', description: 'Data URI' },
                 { origin: 'blob:', description: 'Blob URI' },
                 { origin: 'file:', description: 'File protocol' }
@@ -811,16 +811,14 @@
             const baseHeaders = JSON.parse(document.getElementById('customHeaders').value || '{}');
             
             const injectionTests = [
-                'https://evil.com\r\nX-Injected: true',
-                'https://evil.com\nX-Injected: true',
-                'https://evil.com\r\n\r\nGET /admin HTTP/1.1\r\nHost: evil.com',
                 'https://evil.com%0d%0aX-Injected:%20true',
                 'https://evil.com%0aX-Injected:%20true',
-                'https://evil.com\u000dX-Injected: true',
-                'https://evil.com\u000aX-Injected: true',
-                'https://evil.com\u0085X-Injected: true',
-                'https://evil.com\u2028X-Injected: true',
-                'https://evil.com\u2029X-Injected: true'
+                'https://evil.com%0d%0a%0d%0aGET%20/admin%20HTTP/1.1%0d%0aHost:%20evil.com',
+                'https://evil.com' + String.fromCharCode(13) + 'X-Injected: true',
+                'https://evil.com' + String.fromCharCode(10) + 'X-Injected: true',
+                'https://evil.com' + String.fromCharCode(133) + 'X-Injected: true',
+                'https://evil.com' + String.fromCharCode(8232) + 'X-Injected: true',
+                'https://evil.com' + String.fromCharCode(8233) + 'X-Injected: true'
             ];
             
             for (const injection of injectionTests) {
@@ -981,9 +979,9 @@
                 `https://${domain}˚evil.com`,
                 `https://${domain}⁰evil.com`,
                 `https://${domain}₀evil.com`,
-                `https://${domain}\u3002evil.com`,
-                `https://${domain}\uff0eevil.com`,
-                `https://${domain}\uff61evil.com`,
+                `https://${domain}${String.fromCharCode(0x3002)}evil.com`,
+                `https://${domain}${String.fromCharCode(0xff0e)}evil.com`,
+                `https://${domain}${String.fromCharCode(0xff61)}evil.com`,
                 `https://${domain}%E3%80%82evil.com`,
                 `https://${domain}。evil.com`,
                 `https://${domain}｡evil.com`,
@@ -1115,7 +1113,7 @@
                 `https://${domain}%252eevil%252ecom`,
                 
                 // Unicode encoding
-                `https://${domain}\u002eevil\u002ecom`,
+                `https://${domain}${String.fromCharCode(0x002e)}evil${String.fromCharCode(0x002e)}com`,
                 
                 // HTML encoding
                 `https://${domain}&#46;evil&#46;com`,
@@ -1338,11 +1336,11 @@
             // 3. Browser Quirks Testing
             log('🔍 اختبار Browser Quirks...', 'info');
             const browserQuirks = [
-                { origin: 'https://evil.com\x00.trusted.com' },
-                { origin: 'https://evil.com\x0d.trusted.com' },
-                { origin: 'https://evil.com\x0a.trusted.com' },
+                { origin: 'https://evil.com' + String.fromCharCode(0) + '.trusted.com' },
+                { origin: 'https://evil.com' + String.fromCharCode(13) + '.trusted.com' },
+                { origin: 'https://evil.com' + String.fromCharCode(10) + '.trusted.com' },
                 { origin: 'https://evil.com%00.trusted.com' },
-                { origin: 'https://evil.com\t.trusted.com' },
+                { origin: 'https://evil.com' + String.fromCharCode(9) + '.trusted.com' },
                 { origin: 'https://evil.com .trusted.com' }
             ];
             
