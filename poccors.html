@@ -676,7 +676,7 @@
             iframe.style.display = 'none';
             document.body.appendChild(iframe);
             
-            iframe.contentDocument.write(`
+            iframe.contentDocument.write(\`
                 <script>
                     fetch('${url}', {
                         method: '${document.getElementById('method').value}',
@@ -695,8 +695,8 @@
                             error: err.message
                         }, '*');
                     });
-                </script>
-            `);
+                <\/script>
+            \`);
             
             window.addEventListener('message', function(e) {
                 if (e.data.type === 'cors-test') {
