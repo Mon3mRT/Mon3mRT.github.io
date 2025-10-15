@@ -963,6 +963,33 @@ is a valid probability distribution.</li>
             <div class="formula-box">
                 Posterior = (Likelihood × Prior) / Evidence
             </div>
+            <h2>Example</h2>
+            <p>Suppose Mike wants to go outside but is uncertain if it will rain or not.
+Let's say Mike looked at historical data and discovered that six out of the thirty days in this
+month are typically wet.
+The likelihood of rain in this situation would be 0.2 or 20%.
+Let's also assume that morning clouds are typical, with 45% of days beginning with them.
+Furthermore, 60% of rainy days begin with clouds. What are the possibilities of rain if the
+morning is cloud?</p>
+            <div style="text-align: center; margin-top: 2rem;">
+                <strong>Solution:</strong>
+            </div>
+            <div class="formula-box">
+                <pre>P(θ¦data) = P(data¦θ) ⋅ P(θ) / P(data)         Bayes' Theorem</pre>
+                
+
+                <p>θ = Rain</p>
+                <p>data = Cloud</p>
+                <p>P(θ) = Probability of rain = 0.2 (Prior Probability)</p>
+                <p>P(data) = Probability of clouds present = 0.45</p>
+                <p>P(data¦θ) = Probability of clouds given that it's a rainy day = 0.6 (Likelihood)</p>
+                <p>P(θ¦data) = (0.6 × 0.2) / 0.45 = 0.27</p>
+            </div>
+                <ul>
+                <li><strong>Beta(a,b) = </strong> $$ p^{(a-1)} (1-p)^{(b-1)} $$</li>
+                <li><strong>Binomial(n,p) = </strong> $$ P(X=x) = \binom{n}{x} p^x (1-p)^{n-x} $$</li>
+                <li><strong>Beta(a+x,b+n-x) = </strong> $$ p^{(a-1+x)} (1-p)^{(b-1+n-x)} $$</li>
+                </ul>
         </div>
     </section>
 
