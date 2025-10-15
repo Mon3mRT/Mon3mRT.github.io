@@ -1072,44 +1072,110 @@ morning is cloud?</p>
     <!-- Section 7: Loss Function -->
     <section id="loss">
         <h1>Loss Functions</h1>
+        <h2>Definition:</h2>
         <div class="card">
-            <p>A loss function L(θ, θ̂) quantifies the cost of estimating the true parameter θ with the estimate θ̂. Different loss functions lead to different optimal estimators.</p>
-            
+            <p>A <strong>loss function</strong> 𝐿(𝜃,𝜃̂)measures how far an estimated value 𝜃̂
+ ̂is from the true (but unknown) parameter 𝜃. 
+It quantifies the cost of making an incorrect prediction or 
+estimation.
+             <p>• If 𝜃̂ = 𝜃→ <strong>Loss = 0</strong> (perfect estimate). </p>
+            <p>• If 𝜃̂is far from 𝜃→ <strong>Loss is large</strong> (poor estimate).</p>
+            </p>
+           <p>The main goal of any statistical or machine learning model is 
+to <strong>minimize the loss</strong>, 
+thereby improving accuracy and performance.</p>
             <h2>Common Loss Functions</h2>
+            <p>Different problems require different types of loss functions. 
+The most widely used include: </p>
             <div class="grid">
                 <div class="card">
-                    <h3>Squared Error Loss</h3>
+                    <h3>1-Quadratic(Squared Error) Loss</h3>
                     <div class="formula-box">L(θ, θ̂) = (θ - θ̂)²</div>
-                    <p>Penalizes large errors more heavily</p>
-                    <p><strong>Optimal estimator:</strong> Posterior mean</p>
+                    <p>• Penalizes large errors more heavily.</p>
+                    <p>• Commonly used in <strong>regression</strong> and Bayesian estimation.</p>
+                    <p><strong>Example:</strong></p>
+                    <p>If the true weight is 70 kg and the model predicts 75 kg: <center>L=(70−75)2 = 25</center></p>
                 </div>
                 <div class="card">
-                    <h3>Absolute Error Loss</h3>
+                    <h3>2-Absolute Error Loss</h3>
                     <div class="formula-box">L(θ, θ̂) = |θ - θ̂|</div>
-                    <p>Linear penalty for errors</p>
-                    <p><strong>Optimal estimator:</strong> Posterior median</p>
+                    <p>• Penalizes errors linearly (not squared).</p>
+                    <p>• Less sensitive to outliers — more robust.</p>
                 </div>
                 <div class="card">
-                    <h3>0-1 Loss</h3>
+                    <h3>3-Zero-One (0–1) Loss</h3>
                     <div class="formula-box">L(θ, θ̂) = 0 if |θ-θ̂|&lt;ε, 1 otherwise</div>
-                    <p>All-or-nothing loss</p>
-                    <p><strong>Optimal estimator:</strong> Posterior mode (MAP)</p>
+                    <p>• Used mainly in <strong>classification problems.</strong></p>
+                    <p>• Simply checks if the prediction is correct or not.</p>
                 </div>
             </div>
             
-            <h2>Expected Posterior Loss</h2>
-            <p>The Bayes estimator minimizes the expected posterior loss:</p>
-            <div class="formula-box">
-                θ̂ᴮ = argmin E[L(θ, θ̂)|x] = argmin ∫ L(θ, θ̂) π(θ|x) dθ
-            </div>
+            <h2>Bayesian View</h2>
+            <p>Since 𝜃 is unknown, we minimize the <strong>expected posterior loss:</strong></p>
+            <center><p>p(𝜃̂) = 𝐸[𝐿(𝜃,𝜃̂) ∣ 𝑥] = ∫𝐿(𝜃,𝜃̂)𝜋(𝜃 ∣ 𝑥) 𝑑𝜃</p></center>
+            <p>π(𝜃 ∣ 𝑥): posterior distribution </p>
+            <p>p(𝜃̂): average loss under the posterior</p>
             
-            <h2>Choosing a Loss Function</h2>
-            <ul>
-                <li><strong>Domain considerations:</strong> What are the consequences of over/underestimation?</li>
-                <li><strong>Symmetry:</strong> Are positive and negative errors equally bad?</li>
-                <li><strong>Robustness:</strong> How sensitive should the estimate be to outliers?</li>
-                <li><strong>Interpretability:</strong> Is the resulting estimator meaningful?</li>
-            </ul>
+            <h2>Bayesian estimator:</h2>
+            <center><p>𝜃̂(𝑥) = arg⁡ min 𝑎 p(𝑎)</p></center>
+            <h2>Example</h2>
+
+<p>Suppose the posterior distribution of \(\theta\) is:</p>
+
+<div class="math-block">
+    \[
+    \pi(\theta \mid x) =
+    \begin{cases}
+        2\theta, & 0 \leq \theta \leq 1 \\
+        0, & \text{otherwise}
+    \end{cases}
+    \]
+</div>
+
+<p>and \( L(\theta, \hat{\theta}) = (\theta - \hat{\theta})^2 \):</p>
+
+<div class="math-block">
+    \[
+    \rho(\hat{\theta}) = \int_0^1 (\theta - \hat{\theta})^2 [2\theta] \, d\theta 
+    = \frac{1}{2} - \frac{4\hat{\theta}}{3} + \hat{\theta}^2
+    \]
+</div>
+
+<p>Differentiate and set to zero (to get minimize):</p>
+
+<div class="math-block">
+    \[
+    \frac{d\rho}{d\hat{\theta}} = 2\hat{\theta} - \frac{4}{3} = 0 
+    \Rightarrow \hat{\theta} = \frac{2}{3}
+    \]
+</div>
+
+            
+             <h2>Applications of Loss Functions</h2>
+            <p>Different problems require different types of loss functions. 
+The most widely used include: </p>
+            <div class="grid">
+                <div class="card">
+                    <h3>Regression Models: </h3>
+                    <p>
+                        Predict continuous values.
+                        <p>• L2 Loss: 𝐿 = (𝑡𝑟𝑢𝑒 −𝑝𝑟𝑒𝑑𝑖𝑐𝑡𝑒𝑑)^2 → penalizes large errors.</p>
+                        <p>• L1 Loss: 𝐿 =∣ 𝑡𝑟𝑢𝑒 − 𝑝𝑟𝑒𝑑𝑖𝑐𝑡𝑒𝑑 ∣ → robust to outliers.</p>
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Classification Models:</h3>
+                   <p>
+                        Predict discrete labels.
+                        <p>• 0–1 Loss: 𝐿 = 0if correct, 1if wrong.</p>
+                        <p>• Cross-Entropy Loss: compares predicted probabilities with actual outcomes; penalizes confident wrong predictions..</p>
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Risk Analysis: </h3>
+                   Measures expected cost of errors.<br> R(𝜃̂) = 𝐸[𝐿(𝜃,𝜃̂)]<br>Smaller risk → better decision.
+                </div>
+            
         </div>
     </section>
 
