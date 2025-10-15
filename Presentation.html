@@ -11,6 +11,28 @@
       src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
     </script>
     <style>
+          table {
+      width: 50%;
+      border-collapse: collapse;
+      background-color: #add8e6; /* لون أزرق فاتح */
+      text-align: center;
+    }
+
+    th {
+      background-color: yellow;
+      padding: 10px;
+      border: 1px solid #000;
+    }
+
+    td {
+      padding: 10px;
+      border: 1px solid #000;
+    }
+
+    .red-dot {
+      color: red;
+      font-weight: bold;
+    }
         :root {
             --primary-color: #6366f1;
             --primary-dark: #4f46e5;
@@ -773,7 +795,44 @@ measure of belief or uncertainty about an event, which can
 be updated when new information becomes available.
 </p>
             <h1>1.The Frequentist Approach to Probability</h1>
-            <
+            <table>
+    <tr>
+      <th>Number of rolls</th>
+      <th>times we got 6</th>
+      <th>relative frequency</th>
+    </tr>
+    <tr>
+      <td>100</td>
+      <td>11</td>
+      <td>0.11</td>
+    </tr>
+    <tr>
+      <td>200</td>
+      <td>28</td>
+      <td>0.14</td>
+    </tr>
+    <tr>
+      <td>300</td>
+      <td>50</td>
+      <td>0.1667</td>
+    </tr>
+    <tr>
+      <td>500</td>
+      <td>84</td>
+      <td>0.168</td>
+    </tr>
+    <tr>
+      <td>600</td>
+      <td>100 <span class="red-dot">•</span></td>
+      <td>0.1667</td>
+    </tr>
+    <tr>
+      <td>700</td>
+      <td>115</td>
+      <td>0.1643</td>
+    </tr>
+  </table>
+
             <p> So probability here is limiting value of the relative frequency when 
 number of trials become very large</p>
             <h1>2.The Bayesian Approach to Probability</h1>
