@@ -1188,9 +1188,6 @@ The most widely used include: </p>
             <h2>1. Posterior Mean Estimator</h2>
             <div class="card">
                 <h3>Definition</h3>
-                <div class="formula-box">
-                    θ̂ₘₑₐₙ = E[θ|x] = ∫ θ π(θ|x) dθ
-                </div>
                 <p>This estimator is the "expected value of θ" given the posterior distribution. It minimizes the "average squared error", giving a balanced and smooth estimate.</p>
                 
                 <ul>
@@ -1206,27 +1203,21 @@ The most widely used include: </p>
             <h2>2. Posterior Median Estimator</h2>
             <div class="card">
                 <h3>Definition</h3>
-                <div class="formula-box">
-                    P(θ ≤ θ̂ₘₑᵢᵢₐₙ|x) = P(θ ≥ θ̂ₘₑᵢᵢₐₙ|x) = 0.5
-                </div>
                 
                 <p>The posterior median splits the posterior distribution into two equal halves — half the probability lies on each side. It is "robust" to outliers and skewed distributions.</p>
                 <ul>
                     <li><strong>Loss Function Relation:</strong>Minimizes absolute error loss.</li>
                     <li><strong>Relation to Prior & Posterior:</strong>Calculated directly from the posterior.</li>
-                    <li><strong>Why We Use It:</strong>Provides stable and average performance.</li>
+                    <li><strong>Why We Use It:</strong>Less sensitive to extreme values or asymmetry.</li>
                 </ul>
                 
                 <h3>When to Use</h3>
-                <p>When you care about minimizing overall error on average.</p>
+                <p>When the posterior is skewed or under absolute loss.</p>
             </div>
             
             <h2>3. MAP Estimator (Maximum A Posteriori)</h2>
             <div class="card">
                 <h3>Definition</h3>
-                <div class="formula-box">
-                    θ̂ₘₐₚ = argmax π(θ|x) = argmax [L(x|θ) × π(θ)]
-                </div>
                 
                 <p>MAP combines both prior information and observed data. It finds the parameter value that "maximizes the posterior" (Prior×Likelihood).</p>
                 <ul>
