@@ -942,32 +942,80 @@ Now belief after seeing data called posterior probability</p>
     <!-- Section 4: Prior -->
     <section id="prior">
         <h1>Prior Distributions</h1>
+         <h2>Introduction:</h2>
         <div class="card">
-            <p>The prior distribution represents our beliefs about the parameter before observing data. Choosing an appropriate prior is crucial in Bayesian analysis.</p>
+            <p><strong>The difference between classical statistics and Bayesian statistics:</strong></p>
+            <p>-classical statistics:ِ Assumes there is one fixed unknown truth to be found.</p>
+            <p>-bayesain statistics:treats truth as a belief that is updating with new evidence.</p>
+             <div class="card">
+                    <h3->In the Bayesian world everything starts not with data but with a belief(prior distribution).</h3>
+            </div>
+            <div class="card">
+                    <h3->->updating data is the core idea to Bayesian statistics and can be used to test hypothesis.</h3>
+            </div>
+            
+            <h2>Prior Distribution:</h2>
+            <p>(formal way to state your educated guess about something before you have seen any of the evidence or it is an initial assumption) our belief about a parameter before observing any data.It is the starting point of analysis.</p>
+            
+            
+        <div class="card">
             
             <h2>Types of Priors</h2>
-            <div class="prior-types">
-                <div class="prior-card">
-                    <h3>Informative Prior</h3>
-                    <p>Strong beliefs based on previous studies or expert knowledge</p>
-                </div>
-                <div class="prior-card">
-                    <h3>Non-informative Prior</h3>
-                    <p>Minimal influence on posterior (e.g., uniform, Jeffreys)</p>
-                </div>
-                <div class="prior-card">
-                    <h3>Conjugate Prior</h3>
-                    <p>Mathematical convenience - posterior in same family as prior</p>
-                </div>
+            <div class="card">
+                    <h3>• Informative prior</h3>
+                    <p> is a probability distribution that incorporates existing Knowledge,like listening to an expert opinion or results from a previous study. </p>
+                    <p><strong>Common Informative prior</strong></p>
+                   <ol type="1">
+                       <li>Normal:for parameters concentrated around a central values.</li>
+                       <li>Beta:for probability or proportion between 0 and 1.</li>
+                       <li>Gamma:for positive parameters.</li>
+                   </ol>
             </div>
-            
-            <h2>Common Conjugate Pairs</h2>
-            <div class="formula-box">
-                Binomial likelihood + Beta prior → Beta posterior
-                Normal likelihood + Normal prior → Normal posterior
-                Poisson likelihood + Gamma prior → Gamma posterior
-                Exponential likelihood + Gamma prior → Gamma posterior
-            </div>
+                <div class="card">
+                    <h3>• Non-informative Prior</h3>
+                    <p>Designed to have minimal influence on the posterior distribution when there is little prior knowledge.</p>
+                     <p><strong>Common Uninformative prior</strong></p>
+                   <ol type="1">
+                       <li>uniform</li>
+                       <li>jeffery's</li>
+                       <li>reference</li>
+                       <li>improper</li>
+                   </ol>
+                </div>
+                <div class="card">
+                    <h3>• Conjugate prior</h3>
+                    <p>A conjugate prior is a prior distribution selected so that, when combined with the likelihood function of the data through Bayes’ theorem, the resulting posterior distribution belongs to the same family of distributions as the prior.</p>
+                     <p><strong>Common Uninformative prior</strong></p>
+                   <ol type="1">
+                       <li>uniform</li>
+                       <li>jeffery's</li>
+                       <li>reference</li>
+                       <li>improper</li>
+                   </ol>
+                </div>
+            <p>Examples of common conjugate pairs:</p>
+            <table id="pairs">
+  <tr>
+    <th>prior distribution</th>
+    <th>likelihood function</th>
+    <th>posterior distribution</th>
+  </tr>
+  <tr>
+    <td>Beta prior</td>
+    <td>Binomial</td>
+    <td>Beta</td>
+  </tr>
+  <tr>
+    <td>Gamma prior</td>
+    <td>Poisson</td>
+    <td>Gamma</td>
+  </tr>
+  <tr>
+    <td>Normal prior</td>
+    <td>Normal (with known mean and variance)</td>
+    <td>Normal</td>
+  </tr>
+</table>
             
             <h2>Prior Elicitation Methods</h2>
             <ul>
