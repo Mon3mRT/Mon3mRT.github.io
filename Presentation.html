@@ -938,50 +938,31 @@
     <section id="posterior">
         <h1>Posterior Distribution</h1>
         <div class="card">
-            <p>The posterior distribution represents our updated beliefs about the parameter after observing the data. It combines prior information with the likelihood of the observed data.</p>
+            <p>In Bayesian statistics, the posterior distribution is the probability distribution that allows us
+to update our beliefs about a parameter after observing data.
+Bayes’ theorem is the foundation of the posterior distribution, and it helps us integrate the
+prior (what we believed before), the likelihood (what we observe in the data), and
+normalize everything with the evidence (marginal likelihood).</p>
             
+
+            <h2>Definition of Posterior Distribution:</h2>
+                <p>The posterior distribution is what we obtain after applying Bayes’ theorem to update our
+beliefs.
+It represents the probability distribution of an unknown parameter after considering both
+the prior information and the observed data.</p>
             <div class="formula-box">
-                π(θ|x) = [L(x|θ) × π(θ)] / ∫ L(x|θ) × π(θ) dθ
-                
-                Often written as: Posterior ∝ Likelihood × Prior
+                P(θ¦data) = P(data¦θ) ⋅ P(θ) / P(data)
             </div>
-            
-            <h2>Properties of the Posterior</h2>
+            <h4>Where:</h4>
             <ul>
-                <li><strong>Complete information:</strong> Contains all information about θ given the data</li>
-                <li><strong>Sequential updating:</strong> Today's posterior is tomorrow's prior</li>
-                <li><strong>Coherent:</strong> Obeys probability rules</li>
-                <li><strong>Compromise:</strong> Balances prior beliefs and data evidence</li>
+                <li><strong>P(θ): </strong> the prior ̶ our initial belief about the parameter before seeing the data.</li>
+                <li><strong>P(data¦θ): </strong> the likelihood ̶ how likely the observed data is for different values of θ.</li>
+                <li><strong>P(data):</strong> the evidence (or marginal likelihood) normalizes the result to ensure the posterior
+is a valid probability distribution.</li>
             </ul>
-            
-            <h2>Posterior Computation Methods</h2>
-            <div class="grid">
-                <div class="card">
-                    <h3>Analytical</h3>
-                    <p>Closed-form solution (conjugate priors)</p>
-                </div>
-                <div class="card">
-                    <h3>Numerical Integration</h3>
-                    <p>Grid approximation, quadrature</p>
-                </div>
-                <div class="card">
-                    <h3>MCMC</h3>
-                    <p>Markov Chain Monte Carlo sampling</p>
-                </div>
-                <div class="card">
-                    <h3>Variational Inference</h3>
-                    <p>Approximation through optimization</p>
-                </div>
+            <div class="formula-box">
+                Posterior = (Likelihood × Prior) / Evidence
             </div>
-            
-            <h2>Summarizing the Posterior</h2>
-            <p>Common summaries include:</p>
-            <ul>
-                <li>Central tendency: mean, median, mode</li>
-                <li>Spread: variance, standard deviation</li>
-                <li>Credible intervals: 95% highest posterior density</li>
-                <li>Tail probabilities: P(θ > c|x)</li>
-            </ul>
         </div>
     </section>
 
