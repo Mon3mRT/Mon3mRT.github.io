@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Point Estimation - Interactive Presentation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        [data-theme="dark"] {
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --border-color: #374151;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        /* Navigation Styles */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateY(-100%);
+            opacity: 0;
+        }
+
+        nav.visible {
+            transform: translateY(0);
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        [data-theme="dark"] nav {
+            background: rgba(31, 41, 55, 0.9);
+        }
+
+        [data-theme="dark"] nav.visible {
+            background: rgba(31, 41, 55, 0.98);
+        }
+
+        /* Navbar trigger area */
+        .nav-trigger {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 30px;
+            z-index: 1001;
+            background: transparent;
+            cursor: pointer;
+        }
+
+        /* Navigation indicator */
+        .nav-indicator {
+            position: fixed;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0 0 8px 8px;
+            z-index: 1002;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .nav-trigger:hover .nav-indicator {
+            opacity: 1;
+            transform: translateX(-50%) scaleX(1.2);
+        }
+
+        .nav-trigger::after {
+            content: '▼';
+            position: absolute;
+            top: 6px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--primary-color);
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+
+        .nav-trigger:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(2px);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 1rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        nav li {
+            margin: 0 0.5rem;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--primary-color);
+            background: var(--bg-tertiary);
+            transform: translateY(-1px);
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            width: 3rem;
+            height: 3rem;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition);
+            z-index: 1001;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Section Styles */
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 2rem 3rem;
+            min-height: 100vh;
+            display: none;
+        }
+
+        section.active {
+            display: block;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1, h2 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            text-align: center;
+            padding-bottom: 1rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--text-primary);
+            margin-top: 2rem;
+            position: relative;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -0.5rem;
+            left: 0;
+            width: 3rem;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            text-align: justify;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card:hover::before {
+            opacity: 1;
+        }
+
+
+        /* Formula Box */
+        .formula-box {
+            background: linear-gradient(135deg, var(--bg-tertiary), var(--bg-secondary));
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 1rem;
+            border-radius: var(--radius-lg);
+            overflow-x: auto;
+            color: var(--text-primary);
+            position: relative;
+        }
+
+        .formula-box::before {
+            content: '📐';
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            font-size: 1rem;
+        }
+
+        /* List Styles */
+        ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        ul li {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        ul li::marker {
+            color: var(--primary-color);
+        }
+
+        /* Button Styles */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            transition: var(--transition);
+            margin-top: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Grid Layout for Applications */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        /* Interactive Elements */
+        .interactive {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+            border: 2px dashed var(--primary-color);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .interactive::before {
+            content: '🎯';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            section {
+                padding: 1rem 1rem 2rem;
+            }
+
+            .theme-toggle {
+                top: 0.5rem;
+                right: 0.5rem;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+        }
+
+        /* Prior Types Visual */
+        .prior-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .prior-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 2rem;
+            border-radius: var(--radius-xl);
+            text-align: center;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .prior-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .prior-card:hover {
+            transform: translateY(-8px) scale(1.02);
+        }
+
+        .prior-card:hover::before {
+            opacity: 1;
+            animation: shine 0.6s ease-in-out;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+            z-index: 1001;
+        }
+
+
+        /* Dark Mode Styles */
+        [data-theme="dark"] .card {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+        }
+
+        [data-theme="dark"] .interactive {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+        }
+    </style>
+</head>
+<body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" title="Toggle Dark Mode">
+        <i class="fas fa-moon"></i>
+    </button>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Trigger -->
+    <div class="nav-trigger">
+        <div class="nav-indicator"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="#intro" class="nav-link active"><i class="fas fa-home"></i> Introduction</a></li>
+            <li><a href="#bayesian-pe" class="nav-link"><i class="fas fa-calculator"></i> Bayesian Point Estimation</a></li>
+            <li><a href="#bayes-theorem" class="nav-link"><i class="fas fa-project-diagram"></i> Bayes Theorem</a></li>
+            <li><a href="#prior" class="nav-link"><i class="fas fa-layer-group"></i> Prior</a></li>
+            <li><a href="#likelihood" class="nav-link"><i class="fas fa-chart-bar"></i> Likelihood</a></li>
+            <li><a href="#posterior" class="nav-link"><i class="fas fa-bullseye"></i> Posterior</a></li>
+            <li><a href="#loss" class="nav-link"><i class="fas fa-balance-scale"></i> Loss Function</a></li>
+            <li><a href="#estimators" class="nav-link"><i class="fas fa-cogs"></i> Types of Estimators</a></li>
+            <li><a href="#applications" class="nav-link"><i class="fas fa-rocket"></i> Applications</a></li>
+            <li><a href="#conclusion" class="nav-link"><i class="fas fa-flag-checkered"></i> Conclusion</a></li>
+        </ul>
+    </nav>
+
+
+    <!-- Section 1: Introduction -->
+    <section id="intro" class="active">
+        <h1>Introduction to Bayesian Point Estimation</h1>
+        <div class="card">
+            <p>Welcome to this comprehensive presentation on Bayesian Point Estimation, a fundamental concept in statistical inference and decision theory.</p>
+            
+            <p>Bayesian statistics provides a powerful framework for making inferences about unknown parameters by combining prior knowledge with observed data. Unlike classical (frequentist) statistics, Bayesian methods treat parameters as random variables with probability distributions.</p>
+            
+            <h2>What You'll Learn</h2>
+            <ul>
+                <li>The fundamental principles of Bayesian inference</li>
+                <li>How to apply Bayes' theorem in parameter estimation</li>
+                <li>Different types of priors and their applications</li>
+                <li>Various Bayesian point estimators and when to use them</li>
+                <li>Real-world applications across different fields</li>
+            </ul>
+            
+            <div class="interactive">
+                <h3>Why Bayesian Methods?</h3>
+                <p>Bayesian methods offer several advantages:</p>
+                <ul>
+                    <li>Incorporation of prior knowledge</li>
+                    <li>Quantification of uncertainty</li>
+                    <li>Natural interpretation of results</li>
+                    <li>Coherent framework for decision making</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 2: Bayesian Point Estimation -->
+    <section id="bayesian-pe">
+        <h1>Bayesian Point Estimation</h1>
+        <div class="card">
+            <p>Bayesian point estimation is a method of estimating unknown parameters by finding a single "best" value from the posterior distribution. This approach combines prior beliefs about the parameter with information from observed data.</p>
+            
+            <h2>Key Concepts</h2>
+            <p>In Bayesian point estimation, we:</p>
+            <ul>
+                <li>Start with a prior distribution representing our initial beliefs</li>
+                <li>Update these beliefs using observed data through the likelihood</li>
+                <li>Obtain a posterior distribution</li>
+                <li>Choose a point estimate from this posterior based on a loss function</li>
+            </ul>
+            
+            <div class="formula-box">
+                Posterior ∝ Likelihood × Prior
+                
+                π(θ|x) ∝ L(x|θ) × π(θ)
+            </div>
+            
+            <h2>The Bayesian Workflow</h2>
+            <ol>
+                <li><strong>Specify the model:</strong> Choose likelihood and prior</li>
+                <li><strong>Compute posterior:</strong> Apply Bayes' theorem</li>
+                <li><strong>Choose estimator:</strong> Select based on loss function</li>
+                <li><strong>Make inference:</strong> Report point estimate and uncertainty</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- Section 3: Bayes Theorem -->
+    <section id="bayes-theorem">
+        <h1>Bayes' Theorem</h1>
+        <div class="card">
+            <p>Bayes' theorem is the mathematical foundation of Bayesian inference, providing a way to update probabilities based on new evidence.</p>
+            
+            <div class="formula-box">
+                P(θ|X) = [P(X|θ) × P(θ)] / P(X)
+                
+                Where:
+                - P(θ|X) = Posterior probability
+                - P(X|θ) = Likelihood
+                - P(θ) = Prior probability
+                - P(X) = Marginal likelihood (evidence)
+            </div>
+            
+            <h2>Components Explained</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Prior P(θ)</h3>
+                    <p>Our belief about θ before seeing data</p>
+                </div>
+                <div class="card">
+                    <h3>Likelihood P(X|θ)</h3>
+                    <p>Probability of observing X given θ</p>
+                </div>
+                <div class="card">
+                    <h3>Posterior P(θ|X)</h3>
+                    <p>Updated belief about θ after seeing data</p>
+                </div>
+                <div class="card">
+                    <h3>Evidence P(X)</h3>
+                    <p>Normalizing constant ensuring valid probability</p>
+                </div>
+            </div>
+            
+            <h2>Example: Coin Flipping</h2>
+            <div class="interactive">
+                <p>Suppose we want to estimate the probability θ of getting heads:</p>
+                <ul>
+                    <li>Prior: θ ~ Beta(α=2, β=2) (slightly informative)</li>
+                    <li>Data: 7 heads in 10 flips</li>
+                    <li>Likelihood: Binomial(n=10, k=7, θ)</li>
+                    <li>Posterior: θ|X ~ Beta(α=9, β=5)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 4: Prior -->
+    <section id="prior">
+        <h1>Prior Distributions</h1>
+        <div class="card">
+            <p>The prior distribution represents our beliefs about the parameter before observing data. Choosing an appropriate prior is crucial in Bayesian analysis.</p>
+            
+            <h2>Types of Priors</h2>
+            <div class="prior-types">
+                <div class="prior-card">
+                    <h3>Informative Prior</h3>
+                    <p>Strong beliefs based on previous studies or expert knowledge</p>
+                </div>
+                <div class="prior-card">
+                    <h3>Non-informative Prior</h3>
+                    <p>Minimal influence on posterior (e.g., uniform, Jeffreys)</p>
+                </div>
+                <div class="prior-card">
+                    <h3>Conjugate Prior</h3>
+                    <p>Mathematical convenience - posterior in same family as prior</p>
+                </div>
+            </div>
+            
+            <h2>Common Conjugate Pairs</h2>
+            <div class="formula-box">
+                Binomial likelihood + Beta prior → Beta posterior
+                Normal likelihood + Normal prior → Normal posterior
+                Poisson likelihood + Gamma prior → Gamma posterior
+                Exponential likelihood + Gamma prior → Gamma posterior
+            </div>
+            
+            <h2>Prior Elicitation Methods</h2>
+            <ul>
+                <li><strong>Expert Opinion:</strong> Translate domain knowledge into probability distributions</li>
+                <li><strong>Historical Data:</strong> Use previous studies to inform prior</li>
+                <li><strong>Reference Priors:</strong> Maximize the influence of data (Jeffreys, Reference)</li>
+                <li><strong>Empirical Bayes:</strong> Estimate prior parameters from the data</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 5: Likelihood -->
+    <section id="likelihood">
+        <h1>Likelihood Function</h1>
+        <div class="card">
+            <p>The likelihood function L(θ|x) represents the probability of observing the data x given a specific parameter value θ. It serves as the bridge between the parameter and the observed data.</p>
+            
+            <div class="formula-box">
+                L(θ|x₁, x₂, ..., xₙ) = ∏ᵢ₌₁ⁿ f(xᵢ|θ)
+                
+                For independent observations
+            </div>
+            
+            <h2>Properties of Likelihood</h2>
+            <ul>
+                <li><strong>Not a probability distribution:</strong> Does not integrate to 1 over θ</li>
+                <li><strong>Relative measure:</strong> Only ratios of likelihood values are meaningful</li>
+                <li><strong>Data fixed:</strong> Likelihood is a function of θ with data held constant</li>
+                <li><strong>Maximum Likelihood:</strong> The θ value that maximizes L(θ|x)</li>
+            </ul>
+            
+            <h2>Common Likelihood Functions</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Binomial</h3>
+                    <p>For binary outcomes</p>
+                    <div class="formula-box">L(θ|k,n) ∝ θᵏ(1-θ)ⁿ⁻ᵏ</div>
+                </div>
+                <div class="card">
+                    <h3>Normal</h3>
+                    <p>For continuous data</p>
+                    <div class="formula-box">L(μ,σ²|x) ∝ exp(-Σ(xᵢ-μ)²/2σ²)</div>
+                </div>
+                <div class="card">
+                    <h3>Poisson</h3>
+                    <p>For count data</p>
+                    <div class="formula-box">L(λ|x) ∝ λˣe⁻ᵏλ</div>
+                </div>
+            </div>
+            
+            <h2>Log-Likelihood</h2>
+            <p>Often we work with log-likelihood for computational convenience:</p>
+            <div class="formula-box">
+                ℓ(θ|x) = log L(θ|x) = Σᵢ₌₁ⁿ log f(xᵢ|θ)
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 6: Posterior -->
+    <section id="posterior">
+        <h1>Posterior Distribution</h1>
+        <div class="card">
+            <p>The posterior distribution represents our updated beliefs about the parameter after observing the data. It combines prior information with the likelihood of the observed data.</p>
+            
+            <div class="formula-box">
+                π(θ|x) = [L(x|θ) × π(θ)] / ∫ L(x|θ) × π(θ) dθ
+                
+                Often written as: Posterior ∝ Likelihood × Prior
+            </div>
+            
+            <h2>Properties of the Posterior</h2>
+            <ul>
+                <li><strong>Complete information:</strong> Contains all information about θ given the data</li>
+                <li><strong>Sequential updating:</strong> Today's posterior is tomorrow's prior</li>
+                <li><strong>Coherent:</strong> Obeys probability rules</li>
+                <li><strong>Compromise:</strong> Balances prior beliefs and data evidence</li>
+            </ul>
+            
+            <h2>Posterior Computation Methods</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Analytical</h3>
+                    <p>Closed-form solution (conjugate priors)</p>
+                </div>
+                <div class="card">
+                    <h3>Numerical Integration</h3>
+                    <p>Grid approximation, quadrature</p>
+                </div>
+                <div class="card">
+                    <h3>MCMC</h3>
+                    <p>Markov Chain Monte Carlo sampling</p>
+                </div>
+                <div class="card">
+                    <h3>Variational Inference</h3>
+                    <p>Approximation through optimization</p>
+                </div>
+            </div>
+            
+            <h2>Summarizing the Posterior</h2>
+            <p>Common summaries include:</p>
+            <ul>
+                <li>Central tendency: mean, median, mode</li>
+                <li>Spread: variance, standard deviation</li>
+                <li>Credible intervals: 95% highest posterior density</li>
+                <li>Tail probabilities: P(θ > c|x)</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 7: Loss Function -->
+    <section id="loss">
+        <h1>Loss Functions</h1>
+        <div class="card">
+            <p>A loss function L(θ, θ̂) quantifies the cost of estimating the true parameter θ with the estimate θ̂. Different loss functions lead to different optimal estimators.</p>
+            
+            <h2>Common Loss Functions</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>Squared Error Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = (θ - θ̂)²</div>
+                    <p>Penalizes large errors more heavily</p>
+                    <p><strong>Optimal estimator:</strong> Posterior mean</p>
+                </div>
+                <div class="card">
+                    <h3>Absolute Error Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = |θ - θ̂|</div>
+                    <p>Linear penalty for errors</p>
+                    <p><strong>Optimal estimator:</strong> Posterior median</p>
+                </div>
+                <div class="card">
+                    <h3>0-1 Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = 0 if |θ-θ̂|&lt;ε, 1 otherwise</div>
+                    <p>All-or-nothing loss</p>
+                    <p><strong>Optimal estimator:</strong> Posterior mode (MAP)</p>
+                </div>
+            </div>
+            
+            <h2>Expected Posterior Loss</h2>
+            <p>The Bayes estimator minimizes the expected posterior loss:</p>
+            <div class="formula-box">
+                θ̂ᴮ = argmin E[L(θ, θ̂)|x] = argmin ∫ L(θ, θ̂) π(θ|x) dθ
+            </div>
+            
+            <h2>Choosing a Loss Function</h2>
+            <ul>
+                <li><strong>Domain considerations:</strong> What are the consequences of over/underestimation?</li>
+                <li><strong>Symmetry:</strong> Are positive and negative errors equally bad?</li>
+                <li><strong>Robustness:</strong> How sensitive should the estimate be to outliers?</li>
+                <li><strong>Interpretability:</strong> Is the resulting estimator meaningful?</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Section 8: Types of Bayesian Point Estimators -->
+    <section id="estimators">
+        <h1>Types of Bayesian Point Estimators</h1>
+        <div class="card">
+            <p>Different loss functions lead to different optimal Bayesian point estimators. Here we explore the three most common types.</p>
+            
+            <h2>1. Posterior Mean Estimator</h2>
+            <div class="card">
+                <h3>Definition</h3>
+                <div class="formula-box">
+                    θ̂ₘₑₐₙ = E[θ|x] = ∫ θ π(θ|x) dθ
+                </div>
+                
+                <h3>Properties</h3>
+                <ul>
+                    <li>Minimizes squared error loss</li>
+                    <li>Can be influenced by outliers in the posterior</li>
+                    <li>Always exists if posterior has finite first moment</li>
+                    <li>Linear: E[aθ + b|x] = aE[θ|x] + b</li>
+                </ul>
+                
+                <h3>When to Use</h3>
+                <p>Best when errors in both directions are equally important and you want to minimize average squared error.</p>
+            </div>
+            
+            <h2>2. Posterior Median Estimator</h2>
+            <div class="card">
+                <h3>Definition</h3>
+                <div class="formula-box">
+                    P(θ ≤ θ̂ₘₑᵢᵢₐₙ|x) = P(θ ≥ θ̂ₘₑᵢᵢₐₙ|x) = 0.5
+                </div>
+                
+                <h3>Properties</h3>
+                <ul>
+                    <li>Minimizes absolute error loss</li>
+                    <li>Robust to outliers</li>
+                    <li>Invariant under monotonic transformations</li>
+                    <li>Always exists for continuous posteriors</li>
+                </ul>
+                
+                <h3>When to Use</h3>
+                <p>Best when you want a robust estimate that is less sensitive to extreme values in the posterior.</p>
+            </div>
+            
+            <h2>3. MAP Estimator (Maximum A Posteriori)</h2>
+            <div class="card">
+                <h3>Definition</h3>
+                <div class="formula-box">
+                    θ̂ₘₐₚ = argmax π(θ|x) = argmax [L(x|θ) × π(θ)]
+                </div>
+                
+                <h3>Properties</h3>
+                <ul>
+                    <li>Minimizes 0-1 loss (for small ε)</li>
+                    <li>Mode of the posterior distribution</li>
+                    <li>May not be unique (multimodal posteriors)</li>
+                    <li>Not invariant under reparameterization</li>
+                </ul>
+                
+                <h3>When to Use</h3>
+                <p>Best when you need a single "most probable" value and the posterior is unimodal.</p>
+            </div>
+            
+            <h2>Comparison Example</h2>
+            <div class="interactive">
+                <p>Consider a skewed posterior distribution:</p>
+                <ul>
+                    <li>Posterior Mean: Pulled toward the tail</li>
+                    <li>Posterior Median: More central, robust</li>
+                    <li>MAP: At the peak, may differ significantly from mean</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 9: Applications -->
+    <section id="applications">
+        <h1>Applications of Bayesian Point Estimation</h1>
+        <div class="card">
+            <p>Bayesian point estimation has wide-ranging applications across various fields. Here are some key areas where these methods excel.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🏥 Medical Diagnosis</h3>
+                    <p><strong>Disease Prevalence Estimation</strong></p>
+                    <ul>
+                        <li>Prior: Historical disease rates</li>
+                        <li>Data: Test results from patients</li>
+                        <li>Estimate: Updated disease probability</li>
+                    </ul>
+                    <p>Used in diagnostic tests, clinical trials, and epidemiology.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>💰 Finance & Risk</h3>
+                    <p><strong>Portfolio Optimization</strong></p>
+                    <ul>
+                        <li>Prior: Market beliefs, expert opinions</li>
+                        <li>Data: Historical returns</li>
+                        <li>Estimate: Expected returns and volatility</li>
+                    </ul>
+                    <p>Applied in asset allocation, option pricing, and credit risk.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🤖 Machine Learning</h3>
+                    <p><strong>Hyperparameter Tuning</strong></p>
+                    <ul>
+                        <li>Prior: Domain knowledge about parameters</li>
+                        <li>Data: Model performance metrics</li>
+                        <li>Estimate: Optimal hyperparameters</li>
+                    </ul>
+                    <p>Used in neural networks, Gaussian processes, and Bayesian optimization.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🔬 Scientific Research</h3>
+                    <p><strong>Parameter Estimation in Physics</strong></p>
+                    <ul>
+                        <li>Prior: Theoretical predictions</li>
+                        <li>Data: Experimental measurements</li>
+                        <li>Estimate: Physical constants</li>
+                    </ul>
+                    <p>Applied in cosmology, particle physics, and climate modeling.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>📊 A/B Testing</h3>
+                    <p><strong>Conversion Rate Optimization</strong></p>
+                    <ul>
+                        <li>Prior: Historical conversion rates</li>
+                        <li>Data: User interaction data</li>
+                        <li>Estimate: True conversion rates</li>
+                    </ul>
+                    <p>Used in web optimization, marketing campaigns, and UX design.</p>
+                </div>
+                
+                <div class="card">
+                    <h3>🏭 Quality Control</h3>
+                    <p><strong>Defect Rate Estimation</strong></p>
+                    <ul>
+                        <li>Prior: Manufacturing specifications</li>
+                        <li>Data: Inspection results</li>
+                        <li>Estimate: True defect rate</li>
+                    </ul>
+                    <p>Applied in manufacturing, supply chain, and process improvement.</p>
+                </div>
+            </div>
+            
+            <h2>Case Study: COVID-19 Infection Rate</h2>
+            <div class="interactive">
+                <h3>Problem Setup</h3>
+                <p>Estimating the true infection rate in a population:</p>
+                <ul>
+                    <li><strong>Prior:</strong> Beta(2, 50) - expecting low infection rate</li>
+                    <li><strong>Data:</strong> 15 positive tests out of 200 people tested</li>
+                    <li><strong>Likelihood:</strong> Binomial(n=200, k=15)</li>
+                    <li><strong>Posterior:</strong> Beta(17, 235)</li>
+                </ul>
+                <h3>Results</h3>
+                <ul>
+                    <li><strong>Posterior Mean:</strong> 17/252 ≈ 0.067 (6.7%)</li>
+                    <li><strong>Posterior Median:</strong> ≈ 0.067</li>
+                    <li><strong>MAP Estimate:</strong> 16/250 = 0.064 (6.4%)</li>
+                    <li><strong>95% Credible Interval:</strong> [0.041, 0.099]</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 10: Conclusion -->
+    <section id="conclusion">
+        <h1>Conclusion</h1>
+        <div class="card">
+            <h2>Key Takeaways</h2>
+            <ul>
+                <li><strong>Bayesian Framework:</strong> Provides a coherent way to combine prior knowledge with data</li>
+                <li><strong>Flexibility:</strong> Different priors and loss functions for different scenarios</li>
+                <li><strong>Uncertainty Quantification:</strong> Natural way to express uncertainty through posterior distribution</li>
+                <li><strong>Decision Theory:</strong> Links estimation to real-world consequences through loss functions</li>
+            </ul>
+            
+            <h2>Advantages of Bayesian Point Estimation</h2>
+            <div class="grid">
+                <div class="card">
+                    <h3>✓ Incorporates Prior Knowledge</h3>
+                    <p>Can leverage expert opinion and historical data</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Handles Small Samples</h3>
+                    <p>Particularly useful when data is limited</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Sequential Learning</h3>
+                    <p>Easy to update as new data arrives</p>
+                </div>
+                <div class="card">
+                    <h3>✓ Interpretability</h3>
+                    <p>Probabilistic statements are intuitive</p>
+                </div>
+            </div>
+            
+            <h2>Challenges and Considerations</h2>
+            <ul>
+                <li><strong>Prior Selection:</strong> Results can be sensitive to prior choice</li>
+                <li><strong>Computational Complexity:</strong> May require MCMC or other advanced methods</li>
+                <li><strong>Subjectivity:</strong> Prior beliefs introduce subjective element</li>
+                <li><strong>Model Misspecification:</strong> Wrong likelihood can lead to poor inference</li>
+            </ul>
+            
+            <h2>Future Directions</h2>
+            <div class="interactive">
+                <p>Bayesian methods continue to evolve with:</p>
+                <ul>
+                    <li>Advances in computational methods (Variational Inference, HMC)</li>
+                    <li>Integration with deep learning (Bayesian Neural Networks)</li>
+                    <li>Automated prior selection methods</li>
+                    <li>Scalable algorithms for big data</li>
+                    <li>Applications in AI safety and uncertainty quantification</li>
+                </ul>
+            </div>
+            
+            <h2>Thank You!</h2>
+            <p style="text-align: center; font-size: 1.2rem; margin-top: 2rem;">
+                Thank you for exploring Bayesian Point Estimation with us. We hope this presentation has provided 
+                valuable insights into this powerful statistical framework.
+            </p>
+            
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#intro" class="btn">Back to Introduction</a>
+            </div>
+        </div>
+        
+        <footer>
+            <p>&copy; 2024 Bayesian Point Estimation Presentation | Created for Educational Purposes</p>
+        </footer>
+    </section>
+
+    <script>
+        // Modern JavaScript Application
+        class BayesianApp {
+            constructor() {
+                this.currentSection = 'intro';
+                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+                this.hideNavbarTimeout = null;
+                this.init();
+            }
+
+            init() {
+                this.setupNavigation();
+                this.setupThemeToggle();
+                this.setupProgressBar();
+                this.setupAnimations();
+                this.initializeTheme();
+            }
+
+            setupNavigation() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const sections = document.querySelectorAll('section');
+                const nav = document.querySelector('nav');
+                const navTrigger = document.querySelector('.nav-trigger');
+                
+                // Show navbar when hovering over trigger area
+                navTrigger.addEventListener('mouseenter', () => {
+                    this.showNavbar();
+                });
+
+                navTrigger.addEventListener('mouseleave', () => {
+                    this.hideNavbarWithDelay();
+                });
+
+                // Click to toggle navbar as fallback
+                navTrigger.addEventListener('click', () => {
+                    if (nav.classList.contains('visible')) {
+                        this.hideNavbar();
+                    } else {
+                        this.showNavbar();
+                    }
+                });
+
+                // Keep navbar visible when hovering over it
+                nav.addEventListener('mouseenter', () => {
+                    if (this.hideNavbarTimeout) {
+                        clearTimeout(this.hideNavbarTimeout);
+                        this.hideNavbarTimeout = null;
+                    }
+                    this.showNavbar();
+                });
+
+                nav.addEventListener('mouseleave', () => {
+                    this.hideNavbarWithDelay();
+                });
+                
+                navLinks.forEach(link => {
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.navigateTo(e.target.closest('.nav-link').getAttribute('href').substring(1));
+                        // Hide navbar after clicking a link
+                        this.hideNavbar();
+                    });
+                });
+            }
+
+            showNavbar() {
+                const nav = document.querySelector('nav');
+                nav.classList.add('visible');
+            }
+
+            hideNavbar() {
+                const nav = document.querySelector('nav');
+                nav.classList.remove('visible');
+            }
+
+            hideNavbarWithDelay() {
+                if (this.hideNavbarTimeout) {
+                    clearTimeout(this.hideNavbarTimeout);
+                }
+                this.hideNavbarTimeout = setTimeout(() => {
+                    this.hideNavbar();
+                }, 300); // 300ms delay before hiding
+            }
+
+            navigateTo(sectionId) {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const sections = document.querySelectorAll('section');
+                
+                // Update navigation
+                navLinks.forEach(link => link.classList.remove('active'));
+                document.querySelector(`a[href="#${sectionId}"]`)?.classList.add('active');
+
+                // Update sections
+                sections.forEach(section => section.classList.remove('active'));
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                    this.currentSection = sectionId;
+                    this.updateProgress();
+                    window.scrollTo(0, 0);
+                }
+            }
+
+            setupThemeToggle() {
+                const themeToggle = document.getElementById('themeToggle');
+                themeToggle.addEventListener('click', () => this.toggleTheme());
+            }
+
+            toggleTheme() {
+                this.isDarkMode = !this.isDarkMode;
+                document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+                localStorage.setItem('darkMode', this.isDarkMode);
+                
+                const themeIcon = document.querySelector('#themeToggle i');
+                themeIcon.className = this.isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+            }
+
+            initializeTheme() {
+                if (this.isDarkMode) {
+                    document.documentElement.setAttribute('data-theme', 'dark');
+                    document.querySelector('#themeToggle i').className = 'fas fa-sun';
+                }
+            }
+
+
+            setupProgressBar() {
+                this.updateProgress();
+            }
+
+            updateProgress() {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const activeLink = document.querySelector('.nav-link.active');
+                const currentIndex = Array.from(navLinks).indexOf(activeLink);
+                const progress = ((currentIndex + 1) / navLinks.length) * 100;
+                
+                document.getElementById('progressBar').style.width = `${progress}%`;
+            }
+
+            setupAnimations() {
+                // Intersection Observer for animations
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.style.opacity = '1';
+                            entry.target.style.transform = 'translateY(0)';
+                        }
+                    });
+                }, {
+                    threshold: 0.1,
+                    rootMargin: '0px 0px -100px 0px'
+                });
+
+                document.querySelectorAll('.card, .interactive').forEach(el => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    observer.observe(el);
+                });
+            }
+        }
+
+        // Initialize the application
+        let app;
+        document.addEventListener('DOMContentLoaded', () => {
+            app = new BayesianApp();
+        });
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            const navLinks = document.querySelectorAll('.nav-link');
+            const activeLink = document.querySelector('.nav-link.active');
+            const allLinks = Array.from(navLinks);
+            const currentIndex = allLinks.indexOf(activeLink);
+            
+            if (e.key === 'ArrowRight' && currentIndex < allLinks.length - 1) {
+                allLinks[currentIndex + 1].click();
+            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                allLinks[currentIndex - 1].click();
+            }
+        });
+
+        // Add print styles
+        const printStyles = document.createElement('style');
+        printStyles.innerHTML = `
+            @media print {
+                .theme-toggle, .progress-bar { display: none !important; }
+                nav { display: none; }
+                section { 
+                    display: block !important; 
+                    page-break-after: always;
+                    padding-top: 2rem;
+                }
+                .card:hover { transform: none !important; }
+                .btn { display: none; }
+                footer { page-break-after: avoid; }
+            }
+        `;
+        document.head.appendChild(printStyles);
+    </script>
+</body>
+</html>
