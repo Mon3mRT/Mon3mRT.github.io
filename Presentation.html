@@ -992,8 +992,7 @@ Now belief after seeing data called posterior probability</p>
                        <li>reference</li>
                        <li>improper</li>
                    </ol>
-                </div>
-            <p>Examples of common conjugate pairs:</p>
+                     <p>Examples of common conjugate pairs:</p>
             <table id="pairs">
   <tr>
     <th>prior distribution</th>
@@ -1016,6 +1015,8 @@ Now belief after seeing data called posterior probability</p>
     <td>Normal</td>
   </tr>
 </table>
+     </div>
+           
             
             <h2>Prior Elicitation Methods</h2>
             <ul>
@@ -1062,58 +1063,31 @@ Now belief after seeing data called posterior probability</p>
     <section id="posterior">
         <h1>Posterior Distribution</h1>
         <div class="card">
-            <p>In Bayesian statistics, the posterior distribution is the probability distribution that allows us
-to update our beliefs about a parameter after observing data.
-Bayes’ theorem is the foundation of the posterior distribution, and it helps us integrate the
-prior (what we believed before), the likelihood (what we observe in the data), and
-normalize everything with the evidence (marginal likelihood).</p>
-            
-
-            <h2>Definition of Posterior Distribution:</h2>
-                <p>The posterior distribution is what we obtain after applying Bayes’ theorem to update our
-beliefs.
-It represents the probability distribution of an unknown parameter after considering both
-the prior information and the observed data.</p>
-            <div class="formula-box">
-                P(θ¦data) = P(data¦θ) ⋅ P(θ) / P(data)
-            </div>
-            <h4>Where:</h4>
-            <ul>
-                <li><strong>P(θ): </strong> the prior ̶ our initial belief about the parameter before seeing the data.</li>
-                <li><strong>P(data¦θ): </strong> the likelihood ̶ how likely the observed data is for different values of θ.</li>
-                <li><strong>P(data):</strong> the evidence (or marginal likelihood) normalizes the result to ensure the posterior
-is a valid probability distribution.</li>
-            </ul>
-            <div class="formula-box">
-                Posterior = (Likelihood × Prior) / Evidence
-            </div>
+            <p>The updated belief after considering both prior information and observed data.<br>
+                we apply Bayes' theorem to update data:<br>
+                <center>P(A | B) = P(B | A) *  P(A) / P(B)</center>
+                P(A): the probability of my belief.<br>
+                P(B): the probability of the observed data.<br>
+                P(B|A):the likelihood of the observed data.<br>   
+            </p>
             <h2>Example</h2>
-            <p>Suppose Mike wants to go outside but is uncertain if it will rain or not.
-Let's say Mike looked at historical data and discovered that six out of the thirty days in this
-month are typically wet.
-The likelihood of rain in this situation would be 0.2 or 20%.
-Let's also assume that morning clouds are typical, with 45% of days beginning with them.
-Furthermore, 60% of rainy days begin with clouds. What are the possibilities of rain if the
-morning is cloud?</p>
+            <p>you want to know the probability that your sister's friend is male, given you know that friend has breast cancer.using Bayes' theorem we can calculate this probability:</p>
             <div style="text-align: center; margin-top: 2rem;">
                 <strong>Solution:</strong>
             </div>
             <div class="formula-box">
-                <pre>P(θ¦data) = P(data¦θ) ⋅ P(θ) / P(data)         Bayes' Theorem</pre>
+                <pre>P (male | breast cancer)=P (breast cancer | male) * P (male) / P (breast cancer)</pre>
                 
 
-                <p>θ = Rain</p>
-                <p>data = Cloud</p>
-                <p>P(θ) = Probability of rain = 0.2 (Prior Probability)</p>
-                <p>P(data) = Probability of clouds present = 0.45</p>
-                <p>P(data¦θ) = Probability of clouds given that it's a rainy day = 0.6 (Likelihood)</p>
-                <p>P(θ¦data) = (0.6 × 0.2) / 0.45 = 0.27</p>
+                <p>from government health agencies we know that:</p>
+                <p>P (breast cancer | male)=0.001                (the probability of getting breast cancer given you're male)</p>
+                <p>P (breast cancer)=0.063                             (the overall probability of getting breast cancer)</p>
+                <p>and our assumption or belief that:</p>
+                <p>P (male)=0.5</p>
+                <p>P (male | breast cancer)=0.001 *0.5/0.063 =0.79%</p>
+                <p><strong>we updated our belief that the person was male (50% if you don't know anything else about them) with new information that they had breast cancer.</strong></p>
+                <p><strong>this new information changed our belief from 50% to 0.79%.</strong></p>
             </div>
-                <ul>
-                <li><strong>Beta(a,b) = </strong> $$ p^{(a-1)} (1-p)^{(b-1)} $$</li>
-                <li><strong>Binomial(n,p) = </strong> $$ P(X=x) = \binom{n}{x} p^x (1-p)^{n-x} $$</li>
-                <li><strong>Beta(a+x,b+n-x) = </strong> $$ p^{(a-1+x)} (1-p)^{(b-1+n-x)} $$</li>
-                </ul>
         </div>
     </section>
 
