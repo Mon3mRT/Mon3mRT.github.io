@@ -1241,6 +1241,101 @@ The most widely used include: </p>
                 <h3>When to Use</h3>
                 <p>When there is enough data and no strong prior belief.</p>
             </div>
+            <!-- Comparison Between MLE and MAP Table (Gradient Purple Title, Black Text Columns) -->
+<table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+    <caption style="text-align:left; font-size:1.2rem; font-weight:600; margin-bottom:0.7rem;
+        background:#e5e7eb; padding:0.7rem 0;
+        background-clip:text;
+        -webkit-background-clip:text;
+        color:transparent;
+        background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+        Comparison Between MLE and MAP
+    </caption>
+    <thead style="background:#e5e7eb;">
+        <tr>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Feature</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">MLE</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">MAP</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Uses Prior?</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">No</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Based On</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Likelihood</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior (Prior × Likelihood)</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Depends On</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data only</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data + Prior</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Works Best When</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data is large and reliable</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data is limited or prior is strong</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Output Tendency</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Purely data-driven</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Smoothed by prior belief</td>
+        </tr>
+    </tbody>
+</table>
+            <!-- Summary Table of All Four Estimators (Gradient Title, Black Text) -->
+<table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+    <caption style="text-align:left; font-size:1.2rem; font-weight:600; margin-bottom:0.7rem;
+        background:#e5e7eb; padding:0.7rem 0;
+        background-clip:text;
+        -webkit-background-clip:text;
+        color:transparent;
+        background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+        Summary Table of All Four Estimators
+    </caption>
+    <thead style="background:#e5e7eb;">
+        <tr>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Estimator</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Uses Prior?</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Loss Function</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Best When</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Main Idea</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MLE</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">No</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0–1 Loss</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Large Data</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Choose θ maximizing likelihood</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MAP</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0–1 Loss</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Limited Data</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Choose θ maximizing posterior</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Mean</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Squared Error</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Average performance needed</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Take mean of posterior</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Median</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Absolute Error</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior skewed or outliers</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Take median of posterior</td>
+        </tr>
+    </tbody>
+</table>
             <h2>Example (Dice Problem)</h2>
             <p><strong>Suppose we roll a fair die and want to estimate the probability θ of getting a "6". We roll the die 10 times and observe 3 sixes. We assume a prior distribution Beta(2,2) for θ. Then, the posterior becomes Beta(5,9), which expresses our updated belief about θ after observing data.</strong></p>
             <h3>Posterior Distribution:</h3>
