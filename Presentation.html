@@ -1117,7 +1117,7 @@ morning is cloud?</p>
     <section id="estimators">
         <h1>Types of Bayesian Point Estimators</h1>
         <div class="card">
-            <p>Different loss functions lead to different optimal Bayesian point estimators. Here we explore the three most common types.</p>
+            <p>Bayesian point estimation aims to estimate an unknown parameter (θ) using both data and prior knowledge. Each estimator provides a different way to summarize what we believe about θ after observing data. Here we discuss four main estimators: MLE, MAP, Posterior Mean, and Posterior Median. They differ in how much they rely on data versus prior belief and which loss function they minimize.</p>
             
             <h2>1. Posterior Mean Estimator</h2>
             <div class="card">
@@ -1125,13 +1125,12 @@ morning is cloud?</p>
                 <div class="formula-box">
                     θ̂ₘₑₐₙ = E[θ|x] = ∫ θ π(θ|x) dθ
                 </div>
+                <p>This estimator is the "expected value of θ" given the posterior distribution. It minimizes the "average squared error", giving a balanced and smooth estimate.</p>
                 
-                <h3>Properties</h3>
                 <ul>
-                    <li>Minimizes squared error loss</li>
-                    <li>Can be influenced by outliers in the posterior</li>
-                    <li>Always exists if posterior has finite first moment</li>
-                    <li>Linear: E[aθ + b|x] = aE[θ|x] + b</li>
+                    <li><strong>Loss Function Relation:</strong>Minimizes squared error loss.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong>Uses the entire posterior distribution.</li>
+                    <li><strong>Why We Use It:</strong>Provides stable and average performance.</li>
                 </ul>
                 
                 <h3>When to Use</h3>
@@ -1145,16 +1144,15 @@ morning is cloud?</p>
                     P(θ ≤ θ̂ₘₑᵢᵢₐₙ|x) = P(θ ≥ θ̂ₘₑᵢᵢₐₙ|x) = 0.5
                 </div>
                 
-                <h3>Properties</h3>
+                <p>The posterior median splits the posterior distribution into two equal halves — half the probability lies on each side. It is "robust" to outliers and skewed distributions.</p>
                 <ul>
-                    <li>Minimizes absolute error loss</li>
-                    <li>Robust to outliers</li>
-                    <li>Invariant under monotonic transformations</li>
-                    <li>Always exists for continuous posteriors</li>
+                    <li><strong>Loss Function Relation:</strong>Minimizes absolute error loss.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong>Calculated directly from the posterior.</li>
+                    <li><strong>Why We Use It:</strong>Provides stable and average performance.</li>
                 </ul>
                 
                 <h3>When to Use</h3>
-                <p>Best when you want a robust estimate that is less sensitive to extreme values in the posterior.</p>
+                <p>When you care about minimizing overall error on average.</p>
             </div>
             
             <h2>3. MAP Estimator (Maximum A Posteriori)</h2>
@@ -1164,27 +1162,86 @@ morning is cloud?</p>
                     θ̂ₘₐₚ = argmax π(θ|x) = argmax [L(x|θ) × π(θ)]
                 </div>
                 
-                <h3>Properties</h3>
+                <p>MAP combines both prior information and observed data. It finds the parameter value that "maximizes the posterior" (Prior×Likelihood).</p>
                 <ul>
-                    <li>Minimizes 0-1 loss (for small ε)</li>
-                    <li>Mode of the posterior distribution</li>
-                    <li>May not be unique (multimodal posteriors)</li>
-                    <li>Not invariant under reparameterization</li>
+                    <li><strong>Loss Function Relation:</strong>Also minimizes 0−1 loss, but under the posterior.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong>Includes both; prior affects results when data is limited.</li>
+                    <li><strong>Why We Use It:</strong>It balances data with prior knowledge.</li>
                 </ul>
-                
                 <h3>When to Use</h3>
-                <p>Best when you need a single "most probable" value and the posterior is unimodal.</p>
+                <p>When we have small data samples or trusted prior beliefs.</p>
             </div>
-            
-            <h2>Comparison Example</h2>
-            <div class="interactive">
-                <p>Consider a skewed posterior distribution:</p>
+                        <h2>4. Maximum Likelihood Estimator (MLE)</h2>
+            <div class="card">
+                
+                <p>MLE chooses the parameter value that makes the observed data most likely. It depends "only on the data", not on any prior belief.</p>
+                
                 <ul>
-                    <li>Posterior Mean: Pulled toward the tail</li>
-                    <li>Posterior Median: More central, robust</li>
-                    <li>MAP: At the peak, may differ significantly from mean</li>
+                    <li><strong>Loss Function Relation:</strong>Minimizes 0−1 loss (chooses the most likely θ).</li>
+                    <li><strong>Relation to Prior & Posterior:</strong> Uses only the likelihood, ignores prior knowledge.</li>
+                    <li><strong>Why We Use It:</strong>Simple and purely data-driven.</li>
                 </ul>
+                <h3>When to Use</h3>
+                <p>When there is enough data and no strong prior belief.</p>
             </div>
+            <h2>Example (Dice Problem)</h2>
+            <p><strong>Suppose we roll a fair die and want to estimate the probability θ of getting a "6". We roll the die 10 times and observe 3 sixes. We assume a prior distribution Beta(2,2) for θ. Then, the posterior becomes Beta(5,9), which expresses our updated belief about θ after observing data.</strong></p>
+            <h3>Posterior Distribution:</h3>
+            <p><strong>Using Bayes' theorem:</strong></p>
+            <div class="formula-box">
+                $$
+    p(\theta|\text{data}) \propto \theta^{x+\alpha-1}(1-\theta)^{n-x+\beta-1}
+    $$
+            </div>
+            <pre><strong>Here α=2, β=2, n=10, x=3 → Posterior =Beta(5,9).
+
+            We can now find different estimators numerically:</strong></pre>
+            <!-- Bayesian Estimators Table with Black Text -->
+<table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+    <thead style="background:#e5e7eb;">
+        <tr>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Estimator</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Formula</th>
+            <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Mean</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">a / (a + b)</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.357</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Median</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Approx: (a–1/3)/(a+b–2/3)</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">≈ 0.35</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MAP</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">(a–1)/(a+b–2)</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.333</td>
+        </tr>
+        <tr>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MLE</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">x / n</td>
+            <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.3</td>
+        </tr>
+    </tbody>
+</table>
+                <ul>
+                    <li><strong>Posterior Mean:</strong>It's the expected value of θ under the posterior distribution. It minimizes the squared error loss and gives a balanced estimate.</li>
+                    <li><strong>Posterior Median:</strong> It divides the posterior distribution into two equal halves and minimizes the absolute error loss.</li>
+                    <li><strong>MAP (Maximum A Posteriori):</strong>It's the mode (peak) of the posterior distribution. It gives the most probable value of θ after observing data.</li>
+                    <div class="card">Note: As the sample size increases, the MAP estimator gets closer to the MLE because the likelihood becomes much stronger than the prior.</div>
+                    <li><strong>MLE (Maximum Likelihood Estimator):</strong>It maximizes only the likelihood p(data∣θ) without considering the prior. It ignores prior beliefs.</li>
+                </ul>
+            <p><strong>When to Use:</strong></p>
+                  <ul>
+                    <li>Use Posterior Mean when minimizing average squared error is important.</li>
+                    <li>Use Median for robust estimation with less sensitivity to outliers.</li>
+                    <li>Use MAP when you want the most probable single estimate given both prior and data.</li>
+                    <li>Use MLE when there is no prior knowledge or when the sample size is large (posterior ≈ likelihood).</li>
+                </ul>
         </div>
     </section>
 
