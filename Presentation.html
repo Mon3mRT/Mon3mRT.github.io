@@ -1277,7 +1277,9 @@ The most widely used include: </p>
                     
                     if (this.progressBar) {
                         this.progressBar.style.width = `${progress}%`;
-                        this.progressBar.setAttribute('aria-valuenow', Math.round(progress));
+                        const progressValue = Math.round(progress);
+                        this.progressBar.setAttribute('aria-valuenow', progressValue);
+                        this.progressBar.setAttribute('aria-valuetext', `${progressValue}% complete`);
                     }
                 } catch (error) {
                     console.error('Error updating progress bar:', error);
@@ -1330,6 +1332,8 @@ The most widely used include: </p>
                 this.brushSize = 3;
                 this.isErasing = false;
                 this.initialized = false;
+                this.resizeHandler = null;
+                this.DEFAULT_BRUSH_SIZE = 3;
             }
             
             init() {
@@ -1353,6 +1357,7 @@ The most widely used include: </p>
                     this.initialized = true;
                 } catch (error) {
                     console.error('Error initializing drawing board:', error);
+                    this.initialized = false; // Reset flag on error
                 }
             }
             
@@ -1372,7 +1377,13 @@ The most widely used include: </p>
                     };
                     
                     resizeCanvas();
-                    window.addEventListener('resize', Utils.debounce(resizeCanvas, 250));
+                    
+                    // Remove previous listener if exists
+                    if (this.resizeHandler) {
+                        window.removeEventListener('resize', this.resizeHandler);
+                    }
+                    this.resizeHandler = Utils.debounce(resizeCanvas, 250);
+                    window.addEventListener('resize', this.resizeHandler);
                 } catch (error) {
                     console.error('Error setting up canvas:', error);
                 }
@@ -1408,7 +1419,7 @@ The most widely used include: </p>
                     const brushSizeControl = Utils.safeQuerySelector('#brushSize');
                     if (brushSizeControl) {
                         Utils.safeAddEventListener(brushSizeControl, 'input', (e) => {
-                            this.brushSize = parseInt(e.target.value) || 3;
+                            this.brushSize = parseInt(e.target.value) || this.DEFAULT_BRUSH_SIZE;
                         });
                     }
                     
@@ -1669,12 +1680,12 @@ The most widely used include: </p>
         // Initialize app when DOM is ready
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                window.app = new BayesianApp();
-                window.app.init();
+                window.BayesianPresentation = new BayesianApp();
+                window.BayesianPresentation.init();
             });
         } else {
-            window.app = new BayesianApp();
-            window.app.init();
+            window.BayesianPresentation = new BayesianApp();
+            window.BayesianPresentation.init();
         }
     </script>
 </body>
