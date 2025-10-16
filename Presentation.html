@@ -1056,6 +1056,50 @@ Now belief after seeing data called posterior probability</p>
                     <div class="formula-box">$$ P(X = x \mid \lambda) = \frac{e^{-\lambda}\lambda^x}{x!} $$</div>
                 </div>
             </div>
+            <!-- Desmos Calculators Links with Embedded iframe Viewer (Based on your style) -->
+<div class="card" style="margin-top:2rem;">
+    <h2 style="font-size:1.3rem; text-align:left; margin-bottom:1rem;
+        background-clip:text;
+        -webkit-background-clip:text;
+        color:transparent;
+        background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+        Explore Interactive Desmos Calculators
+    </h2>
+    <div id="desmos-links" style="margin-bottom:1.5rem;">
+        <button class="calc-link" data-url="https://www.desmos.com/calculator/ojuqrilq1y"
+            style="display:block; margin:0.7rem 0; font-size:1.05rem; color:#6366f1; background:none; border:none; text-align:left; text-decoration:underline; cursor:pointer;">
+            Quadratic Function Plot
+        </button>
+        <button class="calc-link" data-url="https://www.desmos.com/calculator/vy8ebiqzqd"
+            style="display:block; margin:0.7rem 0; font-size:1.05rem; color:#6366f1; background:none; border:none; text-align:left; text-decoration:underline; cursor:pointer;">
+            Normal Distribution Visualizer
+        </button>
+        <button class="calc-link" data-url="https://www.desmos.com/calculator/jwbuu46ltj"
+            style="display:block; margin:0.7rem 0; font-size:1.05rem; color:#6366f1; background:none; border:none; text-align:left; text-decoration:underline; cursor:pointer;">
+            Bayesian Update Example
+        </button>
+        <button class="calc-link" data-url="https://www.desmos.com/calculator/ketofvlp3i"
+            style="display:block; margin:0.7rem 0; font-size:1.05rem; color:#6366f1; background:none; border:none; text-align:left; text-decoration:underline; cursor:pointer;">
+            Poisson Process Simulation
+        </button>
+    </div>
+    <div id="iframeContainer" style="width:100%; max-width:900px; height:600px; border:2px solid #8b5cf6; border-radius:12px; overflow:hidden; background:#fff; display:none;">
+        <iframe id="calculatorFrame" src="" style="width:100%; height:100%; border:none;" allowfullscreen></iframe>
+    </div>
+</div>
+<script>
+document.querySelectorAll('.calc-link').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var url = this.getAttribute('data-url');
+        var iframeContainer = document.getElementById('iframeContainer');
+        var calculatorFrame = document.getElementById('calculatorFrame');
+        calculatorFrame.src = url ; // Use embed for Desmos
+        iframeContainer.style.display = 'block';
+        // Scroll to the iframe for better UX (optional)
+        iframeContainer.scrollIntoView({behavior: 'smooth'});
+    });
+});
+</script>
         </div>
     </section>
 
