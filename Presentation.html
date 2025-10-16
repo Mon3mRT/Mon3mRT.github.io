@@ -1026,382 +1026,656 @@ The most widely used include: </p>
     </section>
 
     <script>
-        // Modern JavaScript Application
-        class BayesianApp {
-            constructor() {
+        // Modern JavaScript Application with Error Handling and Modularity
+        'use strict';
+        
+        // Utility functions module
+        const Utils = {
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            },
+            
+            safeQuerySelector(selector, context = document) {
+                try {
+                    return context.querySelector(selector);
+                } catch (error) {
+                    console.error(`Error selecting element: ${selector}`, error);
+                    return null;
+                }
+            },
+            
+            safeQuerySelectorAll(selector, context = document) {
+                try {
+                    return context.querySelectorAll(selector);
+                } catch (error) {
+                    console.error(`Error selecting elements: ${selector}`, error);
+                    return [];
+                }
+            },
+            
+            safeAddEventListener(element, event, handler, options = {}) {
+                if (!element) {
+                    console.warn(`Cannot add event listener: element is null`);
+                    return;
+                }
+                try {
+                    element.addEventListener(event, handler, options);
+                } catch (error) {
+                    console.error(`Error adding event listener: ${event}`, error);
+                }
+            }
+        };
+        
+        // Navigation module
+        class NavigationManager {
+            constructor(app) {
+                this.app = app;
                 this.currentSection = 'intro';
-                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
                 this.hideNavbarTimeout = null;
+                this.nav = Utils.safeQuerySelector('nav');
+                this.navTrigger = Utils.safeQuerySelector('.nav-trigger');
                 this.init();
             }
-
+            
             init() {
-                this.setupNavigation();
-                this.setupThemeToggle();
-                this.setupProgressBar();
-                this.setupAnimations();
-                this.initializeTheme();
+                if (!this.nav || !this.navTrigger) {
+                    console.error('Navigation elements not found');
+                    return;
+                }
                 
-                // Initialize drawing board when DOM is ready
-                document.addEventListener('DOMContentLoaded', () => {
-                    this.setupDrawingBoard();
-                });
+                this.setupEventListeners();
+                this.setupKeyboardNav();
             }
-
-            setupNavigation() {
-                const navLinks = document.querySelectorAll('.nav-link');
-                const sections = document.querySelectorAll('section');
-                const nav = document.querySelector('nav');
-                const navTrigger = document.querySelector('.nav-trigger');
+            
+            setupEventListeners() {
+                const navLinks = Utils.safeQuerySelectorAll('.nav-link');
                 
-                // Show navbar when hovering over trigger area
-                navTrigger.addEventListener('mouseenter', () => {
-                    this.showNavbar();
-                });
-
-                navTrigger.addEventListener('mouseleave', () => {
-                    this.hideNavbarWithDelay();
-                });
-
-                // Click to toggle navbar as fallback
-                navTrigger.addEventListener('click', () => {
-                    if (nav.classList.contains('visible')) {
-                        this.hideNavbar();
-                    } else {
-                        this.showNavbar();
+                // Hover events for nav trigger
+                Utils.safeAddEventListener(this.navTrigger, 'mouseenter', () => this.showNavbar());
+                Utils.safeAddEventListener(this.navTrigger, 'mouseleave', () => this.hideNavbarWithDelay());
+                Utils.safeAddEventListener(this.navTrigger, 'click', () => this.toggleNavbar());
+                
+                // Keyboard support for nav trigger
+                Utils.safeAddEventListener(this.navTrigger, 'keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        this.toggleNavbar();
                     }
                 });
-
-                // Keep navbar visible when hovering over it
-                nav.addEventListener('mouseenter', () => {
+                
+                // Navbar hover events
+                Utils.safeAddEventListener(this.nav, 'mouseenter', () => {
                     if (this.hideNavbarTimeout) {
                         clearTimeout(this.hideNavbarTimeout);
                         this.hideNavbarTimeout = null;
                     }
                     this.showNavbar();
                 });
-
-                nav.addEventListener('mouseleave', () => {
-                    this.hideNavbarWithDelay();
-                });
+                Utils.safeAddEventListener(this.nav, 'mouseleave', () => this.hideNavbarWithDelay());
                 
+                // Navigation link clicks
                 navLinks.forEach(link => {
-                    link.addEventListener('click', (e) => {
+                    Utils.safeAddEventListener(link, 'click', (e) => {
                         e.preventDefault();
-                        const sectionId = e.target.closest('.nav-link').getAttribute('href').substring(1);
-                        this.navigateTo(sectionId);
-                        
-                        // Initialize drawing canvas if navigating to drawing section
-                        if (sectionId === 'drawing-board') {
-                            // Small delay to ensure the section is active and visible
-                            setTimeout(() => this.setupDrawingBoard(), 100);
+                        const sectionId = e.target.closest('.nav-link')?.getAttribute('href')?.substring(1);
+                        if (sectionId) {
+                            this.navigateTo(sectionId);
+                            this.hideNavbar();
                         }
-                        
-                        // Hide navbar after clicking a link
-                        this.hideNavbar();
                     });
                 });
             }
-
+            
+            setupKeyboardNav() {
+                Utils.safeAddEventListener(document, 'keydown', (e) => {
+                    const navLinks = Utils.safeQuerySelectorAll('.nav-link');
+                    const activeLink = Utils.safeQuerySelector('.nav-link.active');
+                    const allLinks = Array.from(navLinks);
+                    const currentIndex = allLinks.indexOf(activeLink);
+                    
+                    if (e.key === 'ArrowRight' && currentIndex < allLinks.length - 1) {
+                        allLinks[currentIndex + 1].click();
+                    } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                        allLinks[currentIndex - 1].click();
+                    }
+                });
+            }
+            
             showNavbar() {
-                const nav = document.querySelector('nav');
-                nav.classList.add('visible');
+                if (this.nav) {
+                    this.nav.classList.add('visible');
+                }
             }
-
+            
             hideNavbar() {
-                const nav = document.querySelector('nav');
-                nav.classList.remove('visible');
+                if (this.nav) {
+                    this.nav.classList.remove('visible');
+                }
             }
-
+            
+            toggleNavbar() {
+                if (this.nav) {
+                    if (this.nav.classList.contains('visible')) {
+                        this.hideNavbar();
+                    } else {
+                        this.showNavbar();
+                    }
+                }
+            }
+            
             hideNavbarWithDelay() {
                 if (this.hideNavbarTimeout) {
                     clearTimeout(this.hideNavbarTimeout);
                 }
-                this.hideNavbarTimeout = setTimeout(() => {
-                    this.hideNavbar();
-                }, 300); // 300ms delay before hiding
+                this.hideNavbarTimeout = setTimeout(() => this.hideNavbar(), 300);
             }
-
+            
             navigateTo(sectionId) {
-                const navLinks = document.querySelectorAll('.nav-link');
-                const sections = document.querySelectorAll('section');
-                
-                // Update navigation
-                navLinks.forEach(link => link.classList.remove('active'));
-                document.querySelector(`a[href="#${sectionId}"]`)?.classList.add('active');
+                try {
+                    const navLinks = Utils.safeQuerySelectorAll('.nav-link');
+                    const sections = Utils.safeQuerySelectorAll('section');
+                    
+                    // Update navigation
+                    navLinks.forEach(link => link.classList.remove('active'));
+                    const targetLink = Utils.safeQuerySelector(`a[href="#${sectionId}"]`);
+                    if (targetLink) {
+                        targetLink.classList.add('active');
+                    }
 
-                // Update sections
-                sections.forEach(section => section.classList.remove('active'));
-                const targetSection = document.getElementById(sectionId);
-                if (targetSection) {
-                    targetSection.classList.add('active');
-                    this.currentSection = sectionId;
-                    this.updateProgress();
-                    window.scrollTo(0, 0);
-                }
-            }
-
-            setupThemeToggle() {
-                const themeToggle = document.getElementById('themeToggle');
-                themeToggle.addEventListener('click', () => this.toggleTheme());
-            }
-
-            toggleTheme() {
-                this.isDarkMode = !this.isDarkMode;
-                document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
-                localStorage.setItem('darkMode', this.isDarkMode);
-                
-                const themeIcon = document.querySelector('#themeToggle i');
-                themeIcon.className = this.isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
-            }
-
-            initializeTheme() {
-                if (this.isDarkMode) {
-                    document.documentElement.setAttribute('data-theme', 'dark');
-                    document.querySelector('#themeToggle i').className = 'fas fa-sun';
-                }
-            }
-
-            setupProgressBar() {
-                this.updateProgress();
-            }
-
-            updateProgress() {
-                const navLinks = document.querySelectorAll('.nav-link');
-                const activeLink = document.querySelector('.nav-link.active');
-                const currentIndex = Array.from(navLinks).indexOf(activeLink);
-                const progress = ((currentIndex + 1) / navLinks.length) * 100;
-                
-                document.getElementById('progressBar').style.width = `${progress}%`;
-            }
-
-            setupAnimations() {
-                // Intersection Observer for animations
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
+                    // Update sections
+                    sections.forEach(section => section.classList.remove('active'));
+                    const targetSection = document.getElementById(sectionId);
+                    if (targetSection) {
+                        targetSection.classList.add('active');
+                        this.currentSection = sectionId;
+                        window.scrollTo(0, 0);
+                        
+                        // Update progress bar
+                        this.app.progressBarManager?.update();
+                        
+                        // Initialize drawing board if needed
+                        if (sectionId === 'drawing-board') {
+                            setTimeout(() => this.app.drawingBoard?.init(), 100);
                         }
-                    });
-                }, {
-                    threshold: 0.1,
-                    rootMargin: '0px 0px -100px 0px'
-                });
-
-                document.querySelectorAll('.card, .interactive').forEach(el => {
-                    el.style.opacity = '0';
-                    el.style.transform = 'translateY(20px)';
-                    el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                    observer.observe(el);
-                });
+                    }
+                } catch (error) {
+                    console.error(`Error navigating to section: ${sectionId}`, error);
+                }
             }
-
-            setupDrawingBoard() {
-                const canvas = document.getElementById('drawingCanvas');
-                if (!canvas) return;
-
-                const ctx = canvas.getContext('2d');
-                const canvasWrapper = canvas.parentElement;
-                
-                // Variables for drawing
-                let isDrawing = false;
-                let lastX = 0;
-                let lastY = 0;
-                let currentColor = '#000000';
-                let brushSize = 3;
-                let isErasing = false;
-
-                // Set canvas size to match parent element
-                function resizeCanvas() {
-                    const rect = canvasWrapper.getBoundingClientRect();
-                    canvas.width = rect.width;
-                    canvas.height = rect.height;
-                    
-                    // Fill with white background
-                    ctx.fillStyle = 'white';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Theme manager module
+        class ThemeManager {
+            constructor() {
+                this.isDarkMode = localStorage.getItem('darkMode') === 'true';
+                this.themeToggle = Utils.safeQuerySelector('#themeToggle');
+                this.init();
+            }
+            
+            init() {
+                if (!this.themeToggle) {
+                    console.error('Theme toggle button not found');
+                    return;
                 }
-
-                // Initial canvas setup
-                resizeCanvas();
                 
-                // Handle window resize
-                window.addEventListener('resize', resizeCanvas);
-
-                // Drawing event handlers
-                function startDrawing(e) {
-                    isDrawing = true;
-                    const rect = canvas.getBoundingClientRect();
-                    lastX = e.clientX - rect.left;
-                    lastY = e.clientY - rect.top;
+                this.applyTheme();
+                Utils.safeAddEventListener(this.themeToggle, 'click', () => this.toggleTheme());
+            }
+            
+            toggleTheme() {
+                try {
+                    this.isDarkMode = !this.isDarkMode;
+                    this.applyTheme();
+                    localStorage.setItem('darkMode', this.isDarkMode);
+                } catch (error) {
+                    console.error('Error toggling theme:', error);
                 }
-
-                function draw(e) {
-                    if (!isDrawing) return;
+            }
+            
+            applyTheme() {
+                try {
+                    document.documentElement.setAttribute('data-theme', this.isDarkMode ? 'dark' : 'light');
+                    const themeIcon = Utils.safeQuerySelector('#themeToggle i');
+                    if (themeIcon) {
+                        themeIcon.className = this.isDarkMode ? 'fas fa-sun' : 'fas fa-moon';
+                    }
+                } catch (error) {
+                    console.error('Error applying theme:', error);
+                }
+            }
+        }
+        
+        // Progress bar module
+        class ProgressBarManager {
+            constructor() {
+                this.progressBar = Utils.safeQuerySelector('#progressBar');
+                this.init();
+            }
+            
+            init() {
+                if (!this.progressBar) {
+                    console.error('Progress bar not found');
+                    return;
+                }
+                this.update();
+            }
+            
+            update() {
+                try {
+                    const navLinks = Utils.safeQuerySelectorAll('.nav-link');
+                    const activeLink = Utils.safeQuerySelector('.nav-link.active');
+                    const currentIndex = Array.from(navLinks).indexOf(activeLink);
+                    const progress = ((currentIndex + 1) / navLinks.length) * 100;
                     
-                    const rect = canvas.getBoundingClientRect();
+                    if (this.progressBar) {
+                        this.progressBar.style.width = `${progress}%`;
+                        this.progressBar.setAttribute('aria-valuenow', Math.round(progress));
+                    }
+                } catch (error) {
+                    console.error('Error updating progress bar:', error);
+                }
+            }
+        }
+        
+        // Animation manager module
+        class AnimationManager {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                try {
+                    const observer = new IntersectionObserver((entries) => {
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting) {
+                                entry.target.style.opacity = '1';
+                                entry.target.style.transform = 'translateY(0)';
+                            }
+                        });
+                    }, {
+                        threshold: 0.1,
+                        rootMargin: '0px 0px -100px 0px'
+                    });
+
+                    const elements = Utils.safeQuerySelectorAll('.card, .interactive');
+                    elements.forEach(el => {
+                        el.style.opacity = '0';
+                        el.style.transform = 'translateY(20px)';
+                        el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        observer.observe(el);
+                    });
+                } catch (error) {
+                    console.error('Error setting up animations:', error);
+                }
+            }
+        }
+        
+        // Drawing board module
+        class DrawingBoard {
+            constructor() {
+                this.canvas = null;
+                this.ctx = null;
+                this.isDrawing = false;
+                this.lastX = 0;
+                this.lastY = 0;
+                this.currentColor = '#000000';
+                this.brushSize = 3;
+                this.isErasing = false;
+                this.initialized = false;
+            }
+            
+            init() {
+                if (this.initialized) return;
+                
+                try {
+                    this.canvas = Utils.safeQuerySelector('#drawingCanvas');
+                    if (!this.canvas) {
+                        console.warn('Drawing canvas not found');
+                        return;
+                    }
+                    
+                    this.ctx = this.canvas.getContext('2d');
+                    if (!this.ctx) {
+                        console.error('Could not get canvas context');
+                        return;
+                    }
+                    
+                    this.setupCanvas();
+                    this.setupEventListeners();
+                    this.initialized = true;
+                } catch (error) {
+                    console.error('Error initializing drawing board:', error);
+                }
+            }
+            
+            setupCanvas() {
+                try {
+                    const canvasWrapper = this.canvas.parentElement;
+                    if (!canvasWrapper) return;
+                    
+                    const resizeCanvas = () => {
+                        const rect = canvasWrapper.getBoundingClientRect();
+                        this.canvas.width = rect.width;
+                        this.canvas.height = rect.height;
+                        
+                        // Fill with white background
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    };
+                    
+                    resizeCanvas();
+                    window.addEventListener('resize', Utils.debounce(resizeCanvas, 250));
+                } catch (error) {
+                    console.error('Error setting up canvas:', error);
+                }
+            }
+            
+            setupEventListeners() {
+                try {
+                    // Mouse events
+                    Utils.safeAddEventListener(this.canvas, 'mousedown', (e) => this.startDrawing(e));
+                    Utils.safeAddEventListener(this.canvas, 'mousemove', (e) => this.draw(e));
+                    Utils.safeAddEventListener(this.canvas, 'mouseup', () => this.stopDrawing());
+                    Utils.safeAddEventListener(this.canvas, 'mouseout', () => this.stopDrawing());
+                    
+                    // Touch events with passive: false for better performance
+                    Utils.safeAddEventListener(this.canvas, 'touchstart', (e) => this.handleTouch(e), { passive: false });
+                    Utils.safeAddEventListener(this.canvas, 'touchmove', (e) => this.handleTouch(e), { passive: false });
+                    Utils.safeAddEventListener(this.canvas, 'touchend', () => this.stopDrawing(), { passive: false });
+                    
+                    // Color picker
+                    const colorOptions = Utils.safeQuerySelectorAll('.color-option');
+                    colorOptions.forEach(option => {
+                        Utils.safeAddEventListener(option, 'click', () => this.selectColor(option));
+                        // Keyboard support for color options
+                        Utils.safeAddEventListener(option, 'keydown', (e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                                e.preventDefault();
+                                this.selectColor(option);
+                            }
+                        });
+                    });
+                    
+                    // Brush size control
+                    const brushSizeControl = Utils.safeQuerySelector('#brushSize');
+                    if (brushSizeControl) {
+                        Utils.safeAddEventListener(brushSizeControl, 'input', (e) => {
+                            this.brushSize = parseInt(e.target.value) || 3;
+                        });
+                    }
+                    
+                    // Control buttons
+                    this.setupControlButtons();
+                } catch (error) {
+                    console.error('Error setting up event listeners:', error);
+                }
+            }
+            
+            setupControlButtons() {
+                const clearBtn = Utils.safeQuerySelector('#clearCanvas');
+                if (clearBtn) {
+                    Utils.safeAddEventListener(clearBtn, 'click', () => this.clearCanvas());
+                }
+                
+                const eraseBtn = Utils.safeQuerySelector('#eraseMode');
+                if (eraseBtn) {
+                    Utils.safeAddEventListener(eraseBtn, 'click', () => this.setEraseMode(true));
+                }
+                
+                const drawBtn = Utils.safeQuerySelector('#drawMode');
+                if (drawBtn) {
+                    Utils.safeAddEventListener(drawBtn, 'click', () => this.setEraseMode(false));
+                    drawBtn.classList.add('active');
+                }
+                
+                const downloadBtn = Utils.safeQuerySelector('#downloadCanvas');
+                if (downloadBtn) {
+                    Utils.safeAddEventListener(downloadBtn, 'click', () => this.downloadCanvas());
+                }
+            }
+            
+            selectColor(option) {
+                try {
+                    Utils.safeQuerySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
+                    option.classList.add('active');
+                    this.currentColor = option.getAttribute('data-color') || '#000000';
+                    this.isErasing = false;
+                    
+                    const drawBtn = Utils.safeQuerySelector('#drawMode');
+                    const eraseBtn = Utils.safeQuerySelector('#eraseMode');
+                    drawBtn?.classList.add('active');
+                    eraseBtn?.classList.remove('active');
+                } catch (error) {
+                    console.error('Error selecting color:', error);
+                }
+            }
+            
+            setEraseMode(erase) {
+                try {
+                    this.isErasing = erase;
+                    const drawBtn = Utils.safeQuerySelector('#drawMode');
+                    const eraseBtn = Utils.safeQuerySelector('#eraseMode');
+                    
+                    if (erase) {
+                        drawBtn?.classList.remove('active');
+                        eraseBtn?.classList.add('active');
+                    } else {
+                        drawBtn?.classList.add('active');
+                        eraseBtn?.classList.remove('active');
+                    }
+                } catch (error) {
+                    console.error('Error setting erase mode:', error);
+                }
+            }
+            
+            clearCanvas() {
+                try {
+                    if (this.ctx && this.canvas) {
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                    }
+                } catch (error) {
+                    console.error('Error clearing canvas:', error);
+                }
+            }
+            
+            downloadCanvas() {
+                try {
+                    if (this.canvas) {
+                        const link = document.createElement('a');
+                        link.download = 'bayesian-drawing.png';
+                        link.href = this.canvas.toDataURL('image/png');
+                        link.click();
+                    }
+                } catch (error) {
+                    console.error('Error downloading canvas:', error);
+                }
+            }
+            
+            startDrawing(e) {
+                try {
+                    this.isDrawing = true;
+                    const rect = this.canvas.getBoundingClientRect();
+                    this.lastX = e.clientX - rect.left;
+                    this.lastY = e.clientY - rect.top;
+                } catch (error) {
+                    console.error('Error starting drawing:', error);
+                }
+            }
+            
+            draw(e) {
+                if (!this.isDrawing || !this.ctx) return;
+                
+                try {
+                    const rect = this.canvas.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const y = e.clientY - rect.top;
                     
-                    ctx.lineJoin = 'round';
-                    ctx.lineCap = 'round';
-                    ctx.lineWidth = brushSize;
-                    ctx.strokeStyle = isErasing ? 'white' : currentColor;
+                    this.ctx.lineJoin = 'round';
+                    this.ctx.lineCap = 'round';
+                    this.ctx.lineWidth = this.brushSize;
+                    this.ctx.strokeStyle = this.isErasing ? 'white' : this.currentColor;
                     
-                    ctx.beginPath();
-                    ctx.moveTo(lastX, lastY);
-                    ctx.lineTo(x, y);
-                    ctx.stroke();
+                    this.ctx.beginPath();
+                    this.ctx.moveTo(this.lastX, this.lastY);
+                    this.ctx.lineTo(x, y);
+                    this.ctx.stroke();
                     
-                    lastX = x;
-                    lastY = y;
+                    this.lastX = x;
+                    this.lastY = y;
+                } catch (error) {
+                    console.error('Error drawing:', error);
                 }
-
-                function stopDrawing() {
-                    isDrawing = false;
-                }
-
-                // Touch event handler
-                function handleTouch(e) {
-                    e.preventDefault(); // Prevent scrolling while drawing
+            }
+            
+            stopDrawing() {
+                this.isDrawing = false;
+            }
+            
+            handleTouch(e) {
+                e.preventDefault();
+                
+                try {
                     const touch = e.touches[0];
-                    const rect = canvas.getBoundingClientRect();
+                    if (!touch) return;
                     
+                    const rect = this.canvas.getBoundingClientRect();
                     const touchX = touch.clientX - rect.left;
                     const touchY = touch.clientY - rect.top;
                     
                     if (e.type === 'touchstart') {
-                        isDrawing = true;
-                        lastX = touchX;
-                        lastY = touchY;
-                    } else if (e.type === 'touchmove' && isDrawing) {
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.lineWidth = brushSize;
-                        ctx.strokeStyle = isErasing ? 'white' : currentColor;
+                        this.isDrawing = true;
+                        this.lastX = touchX;
+                        this.lastY = touchY;
+                    } else if (e.type === 'touchmove' && this.isDrawing && this.ctx) {
+                        this.ctx.lineJoin = 'round';
+                        this.ctx.lineCap = 'round';
+                        this.ctx.lineWidth = this.brushSize;
+                        this.ctx.strokeStyle = this.isErasing ? 'white' : this.currentColor;
                         
-                        ctx.beginPath();
-                        ctx.moveTo(lastX, lastY);
-                        ctx.lineTo(touchX, touchY);
-                        ctx.stroke();
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(this.lastX, this.lastY);
+                        this.ctx.lineTo(touchX, touchY);
+                        this.ctx.stroke();
                         
-                        lastX = touchX;
-                        lastY = touchY;
+                        this.lastX = touchX;
+                        this.lastY = touchY;
                     }
+                } catch (error) {
+                    console.error('Error handling touch:', error);
                 }
-
-                // Add mouse event listeners
-                canvas.addEventListener('mousedown', startDrawing);
-                canvas.addEventListener('mousemove', draw);
-                canvas.addEventListener('mouseup', stopDrawing);
-                canvas.addEventListener('mouseout', stopDrawing);
-                
-                // Add touch event listeners for mobile
-                canvas.addEventListener('touchstart', handleTouch, { passive: false });
-                canvas.addEventListener('touchmove', handleTouch, { passive: false });
-                canvas.addEventListener('touchend', stopDrawing, { passive: false });
-                
-                // Color picker functionality
-                document.querySelectorAll('.color-option').forEach(option => {
-                    option.addEventListener('click', function() {
-                        document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-                        this.classList.add('active');
-                        currentColor = this.getAttribute('data-color');
-                        isErasing = false;
-                        document.getElementById('drawMode').classList.add('active');
-                        document.getElementById('eraseMode').classList.remove('active');
+            }
+        }
+        
+        // Desmos calculator integration
+        class DesmosIntegration {
+            constructor() {
+                this.init();
+            }
+            
+            init() {
+                try {
+                    const calcLinks = Utils.safeQuerySelectorAll('.calc-link');
+                    calcLinks.forEach(btn => {
+                        Utils.safeAddEventListener(btn, 'click', () => {
+                            const url = btn.getAttribute('data-url');
+                            if (url) {
+                                this.loadCalculator(url);
+                            }
+                        });
                     });
-                });
-
-                // Brush size control
-                const brushSizeControl = document.getElementById('brushSize');
-                if (brushSizeControl) {
-                    brushSizeControl.addEventListener('input', function() {
-                        brushSize = this.value;
-                    });
+                } catch (error) {
+                    console.error('Error initializing Desmos integration:', error);
                 }
-
-                // Clear canvas button
-                const clearBtn = document.getElementById('clearCanvas');
-                if (clearBtn) {
-                    clearBtn.addEventListener('click', function() {
-                        ctx.fillStyle = 'white';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    });
+            }
+            
+            loadCalculator(url) {
+                try {
+                    const iframeContainer = Utils.safeQuerySelector('#iframeContainer');
+                    const calculatorFrame = Utils.safeQuerySelector('#calculatorFrame');
+                    
+                    if (iframeContainer && calculatorFrame) {
+                        calculatorFrame.src = url;
+                        iframeContainer.style.display = 'block';
+                        iframeContainer.scrollIntoView({ behavior: 'smooth' });
+                    }
+                } catch (error) {
+                    console.error('Error loading calculator:', error);
                 }
-
-                // Eraser mode button
-                const eraseBtn = document.getElementById('eraseMode');
-                if (eraseBtn) {
-                    eraseBtn.addEventListener('click', function() {
-                        isErasing = true;
-                        this.classList.add('active');
-                        document.getElementById('drawMode').classList.remove('active');
-                    });
+            }
+        }
+        
+        // Main application class
+        class BayesianApp {
+            constructor() {
+                this.navigationManager = null;
+                this.themeManager = null;
+                this.progressBarManager = null;
+                this.animationManager = null;
+                this.drawingBoard = null;
+                this.desmosIntegration = null;
+            }
+            
+            init() {
+                try {
+                    this.themeManager = new ThemeManager();
+                    this.progressBarManager = new ProgressBarManager();
+                    this.animationManager = new AnimationManager();
+                    this.navigationManager = new NavigationManager(this);
+                    this.drawingBoard = new DrawingBoard();
+                    this.desmosIntegration = new DesmosIntegration();
+                    
+                    // Add print styles
+                    this.addPrintStyles();
+                    
+                    console.log('Bayesian App initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing Bayesian App:', error);
                 }
-
-                // Draw mode button
-                const drawBtn = document.getElementById('drawMode');
-                if (drawBtn) {
-                    drawBtn.addEventListener('click', function() {
-                        isErasing = false;
-                        this.classList.add('active');
-                        document.getElementById('eraseMode').classList.remove('active');
-                    });
-                    // Set as active by default
-                    drawBtn.classList.add('active');
-                }
-
-                // Download canvas button
-                const downloadBtn = document.getElementById('downloadCanvas');
-                if (downloadBtn) {
-                    downloadBtn.addEventListener('click', function() {
-                        const link = document.createElement('a');
-                        link.download = 'bayesian-drawing.png';
-                        link.href = canvas.toDataURL('image/png');
-                        link.click();
-                    });
+            }
+            
+            addPrintStyles() {
+                try {
+                    const printStyles = document.createElement('style');
+                    printStyles.innerHTML = `
+                        @media print {
+                            .theme-toggle, .progress-bar { display: none !important; }
+                            nav { display: none; }
+                            section { 
+                                display: block !important; 
+                                page-break-after: always;
+                                padding-top: 2rem;
+                            }
+                            .card:hover { transform: none !important; }
+                            .btn { display: none; }
+                            footer { page-break-after: avoid; }
+                        }
+                    `;
+                    document.head.appendChild(printStyles);
+                } catch (error) {
+                    console.error('Error adding print styles:', error);
                 }
             }
         }
 
-        // Initialize the application
-        document.addEventListener('DOMContentLoaded', () => {
-            const app = new BayesianApp();
-        });
-
-        // Keyboard navigation
-        document.addEventListener('keydown', function(e) {
-            const navLinks = document.querySelectorAll('.nav-link');
-            const activeLink = document.querySelector('.nav-link.active');
-            const allLinks = Array.from(navLinks);
-            const currentIndex = allLinks.indexOf(activeLink);
-            
-            if (e.key === 'ArrowRight' && currentIndex < allLinks.length - 1) {
-                allLinks[currentIndex + 1].click();
-            } else if (e.key === 'ArrowLeft' && currentIndex > 0) {
-                allLinks[currentIndex - 1].click();
-            }
-        });
-
-        // Add print styles
-        const printStyles = document.createElement('style');
-        printStyles.innerHTML = `
-            @media print {
-                .theme-toggle, .progress-bar { display: none !important; }
-                nav { display: none; }
-                section { 
-                    display: block !important; 
-                    page-break-after: always;
-                    padding-top: 2rem;
-                }
-                .card:hover { transform: none !important; }
-                .btn { display: none; }
-                footer { page-break-after: avoid; }
-            }
-        `;
-        document.head.appendChild(printStyles);
+        // Initialize app when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                window.app = new BayesianApp();
+                window.app.init();
+            });
+        } else {
+            window.app = new BayesianApp();
+            window.app.init();
+        }
     </script>
 </body>
 </html>
