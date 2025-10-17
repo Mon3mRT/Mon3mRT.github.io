@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Bayesian Point Estimation - Interactive Presentation</title>
+
+    <!--
+      Cutting-edge motion architecture notes:
+
+      Libraries used (all CDN, replaceable with self-hosted):
+        - GSAP + ScrollTrigger: robust scroll-driven animations
+        - Lenis: smooth scrolling (degrades gracefully)
+        - Anime.js: SVG morphing + micro-interactions
+        - (Optional) Three.js: lightweight 3D ambient scene, only on capable devices
+        - MathJax: math rendering
+
+      Fallbacks & Performance:
+        - Respect prefers-reduced-motion: disable/limit non-essential animations
+        - Use transform/opacity for animations to avoid layout thrash
+        - Throttle pointer events; pause background anims on tab hidden
+        - Device capability checks (navigator.deviceMemory, hardwareConcurrency)
+        - IntersectionObserver as baseline; CSS Scroll-Driven Animations where supported
+    -->
+
+    <!-- Add JS-enabled class early (so CSS can scope animation-only styles if needed) -->
+    <script>
+      (function(){ try { document.documentElement.classList.add('js-enabled'); } catch(e){} })();
+    </script>
+
+    <!-- Fonts & Icons -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet"
+    />
+    <link
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+        rel="stylesheet"
+    />
+
+    <!-- Polyfills: replace polyfill.io with core-js bundle (safe alternative) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/core-js/3.37.1/minified.min.js" defer></script>
+
+    <!-- MathJax (no polyfill.io needed) -->
+    <script
+        id="MathJax-script"
+        async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"
+    ></script>
+
+    <!-- GSAP + ScrollTrigger (for scroll-based animations) -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"
+        defer
+    ></script>
+    <script
+        src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
+        defer
+    ></script>
+
+    <!-- Lenis for smooth scrolling (optional) -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/@studio-freight/lenis@1/bundled/lenis.min.js"
+        defer
+    ></script>
+
+    <!-- Anime.js for SVG morphing & micro-interactions -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"
+        defer
+    ></script>
+
+    <!-- Optional: Three.js (ambient 3D only on capable devices) -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"
+        defer
+    ></script>
+
+    <style>
+        :root {
+            /* Colors */
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #8b5cf6;
+            --accent-color: #06b6d4;
+
+            /* Surfaces */
+            --text-primary: #f9fafb;
+            --text-secondary: #d1d5db;
+            --bg-primary: #111827;
+            --bg-secondary: #0b1220;
+            --bg-tertiary: #1f2937;
+            --border-color: #2a3444;
+
+            /* Motion language */
+            --ease-standard: cubic-bezier(0.22, 1, 0.36, 1);
+            --ease-emph: cubic-bezier(0.19, 1, 0.22, 1);
+            --d-fast: 240ms;
+            --d-med: 480ms;
+            --d-slow: 900ms;
+
+            /* Radii & shadows */
+            --radius-md: 10px;
+            --radius-lg: 14px;
+            --radius-xl: 18px;
+
+            --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.18);
+            --shadow-md: 0 8px 24px rgb(0 0 0 / 0.25);
+            --shadow-lg: 0 24px 60px rgb(0 0 0 / 0.35);
+
+            /* Dynamic gradient stops (animated per section) */
+            --grad1: rgba(99, 102, 241, 0.18);
+            --grad2: rgba(139, 92, 246, 0.15);
+            --grad3: rgba(6, 182, 212, 0.14);
+
+            /* Backdrop blur strength */
+            --blur-strength: 10px;
+        }
+
+        [data-theme='light'] {
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f6f8fc;
+            --bg-tertiary: #eef2f7;
+            --border-color: #e2e8f0;
+        }
+
+        /* Smooth theme transitions */
+        html[data-theme],
+        body,
+        .dynamic-bg,
+        .gradient-flow,
+        nav,
+        .card,
+        .formula-box {
+            transition:
+                background-color var(--d-med) var(--ease-standard),
+                color var(--d-med) var(--ease-standard),
+                border-color var(--d-med) var(--ease-standard),
+                box-shadow var(--d-med) var(--ease-standard);
+        }
+
+        /* Global reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+        html, body {
+            height: 100%;
+        }
+        html {
+            scroll-behavior: auto; /* Lenis manages smooth scroll */
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, 'Helvetica Neue', Arial, 'Noto Sans', 'Apple Color Emoji', 'Segoe UI Emoji';
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Accessibility: reduce motion */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 1ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+
+        /* Ambient layers */
+        .dynamic-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            background:
+                radial-gradient(1200px 800px at 10% 10%, var(--grad1), transparent 55%),
+                radial-gradient(1200px 800px at 90% 30%, var(--grad2), transparent 55%),
+                radial-gradient(1000px 600px at 50% 90%, var(--grad3), transparent 45%),
+                linear-gradient(135deg, #0a0f1c, #0d1426 40%, #101a30);
+            filter: saturate(1.05);
+        }
+        .gradient-flow {
+            position: fixed;
+            inset: -20% -10%;
+            z-index: -2;
+            background: conic-gradient(from 180deg at 50% 50%, rgba(99,102,241,0.25), rgba(139,92,246,0.25), rgba(6,182,212,0.25), rgba(99,102,241,0.25));
+            animation: slowRotate 80s linear infinite;
+            -webkit-mask-image: radial-gradient(60% 60% at 50% 50%, #000, transparent 70%);
+                    mask-image: radial-gradient(60% 60% at 50% 50%, #000, transparent 70%);
+            opacity: 0.28;
+            pointer-events: none;
+        }
+        @keyframes slowRotate { to { transform: rotate(360deg); } }
+
+        /* Ambient canvas particles */
+        .ambient-canvas-wrap { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+        #ambientCanvas { width: 100%; height: 100%; display: block; }
+
+        /* Top controls */
+        .controls-wrap {
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            z-index: 1002;
+        }
+        .control-icon {
+            width: 2.8rem; height: 2.8rem;
+            display: inline-flex; align-items: center; justify-content: center;
+            border-radius: 999px; border: 1px solid var(--border-color);
+            background: var(--bg-primary); color: var(--text-primary);
+            box-shadow: var(--shadow-sm); cursor: pointer;
+            transition: transform var(--d-fast) var(--ease-emph), background var(--d-fast) var(--ease-standard), box-shadow var(--d-fast) var(--ease-standard);
+            backdrop-filter: blur(var(--blur-strength)); -webkit-backdrop-filter: blur(var(--blur-strength));
+            position: relative; overflow: hidden;
+        }
+        .control-icon:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--shadow-md); }
+        .control-icon i { font-size: 1.1rem; }
+
+        /* Ripple effect (for buttons & icons) */
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0.25) 40%, rgba(255,255,255,0) 70%);
+            animation: ripple 600ms var(--ease-emph);
+            mix-blend-mode: screen;
+        }
+        @keyframes ripple {
+            from { opacity: 0.6; width: 0; height: 0; }
+            to   { opacity: 0; width: 200px; height: 200px; }
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed; top: 0; left: 0; height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            z-index: 1001; width: 0%; transition: width 120ms linear;
+        }
+
+        /* Nav */
+        .nav-trigger {
+            position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+            width: min(80px, 16vw); height: 24px; z-index: 1001; cursor: pointer;
+        }
+        .nav-indicator {
+            width: 60px; height: 4px; margin: auto;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0 0 8px 8px; opacity: 0.8;
+            transition: transform var(--d-fast) var(--ease-standard), opacity var(--d-fast) var(--ease-standard);
+        }
+        .nav-trigger:hover .nav-indicator { opacity: 1; transform: scaleX(1.15); }
+
+        nav {
+            position: fixed; top: 0; width: 100%; z-index: 1000;
+            border-bottom: 1px solid var(--border-color);
+            backdrop-filter: blur(var(--blur-strength)); -webkit-backdrop-filter: blur(var(--blur-strength));
+            background: rgba(17, 24, 39, 0.85);
+            transform: translateY(-100%); opacity: 0;
+            transition: transform var(--d-med) var(--ease-emph), opacity var(--d-med) var(--ease-standard), background var(--d-med) var(--ease-standard);
+            will-change: transform, opacity;
+        }
+        [data-theme='light'] nav { background: rgba(255,255,255,0.9); }
+        nav.visible { transform: translateY(0); opacity: 1; }
+        nav ul {
+            list-style: none; margin: 0; padding: 0.6rem 0.8rem;
+            display: flex; justify-content: center; flex-wrap: wrap; gap: 0.4rem;
+        }
+        nav a {
+            color: var(--text-secondary); text-decoration: none;
+            padding: 0.55rem 0.8rem; border-radius: 999px; border: 1px solid transparent;
+            transition: transform var(--d-fast) var(--ease-standard), color var(--d-fast) var(--ease-standard), background var(--d-fast) var(--ease-standard), border-color var(--d-fast) var(--ease-standard);
+            display: inline-flex; align-items: center; gap: 0.5rem; font-weight: 500; font-size: 0.85rem; position: relative; overflow: hidden;
+        }
+        nav a:hover {
+            color: var(--primary-color); background: rgba(255,255,255,0.05);
+            transform: translateY(-1px); border-color: var(--border-color);
+        }
+        nav a.active {
+            color: var(--primary-color); background: rgba(255,255,255,0.08);
+            border-color: color-mix(in oklab, var(--primary-color) 40%, var(--border-color));
+            box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--primary-color) 30%, transparent);
+        }
+
+        /* Sections (stacked for scrollytelling) */
+        section {
+            max-width: 1200px; margin: 0 auto;
+            padding: clamp(72px, 8vw, 96px) 1.25rem clamp(90px, 9vw, 120px);
+            min-height: 100svh; position: relative;
+        }
+
+        /* Headings */
+        h1 {
+            font-size: clamp(2.2rem, 2.5rem + 1.6vw, 3.5rem);
+            line-height: 1.1; text-align: center; margin: 0 0 1.8rem; font-weight: 700;
+            background-image: linear-gradient(120deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+            letter-spacing: -0.02em; filter: drop-shadow(0 2px 18px rgba(99,102,241,0.15));
+            will-change: transform, opacity;
+        }
+        h2 {
+            font-size: clamp(1.4rem, 1.1rem + 1.2vw, 2rem);
+            margin: 1.8rem 0 1rem; font-weight: 600; color: var(--text-primary); position: relative;
+        }
+        h2 .underline {
+            content: ''; position: absolute; bottom: -0.5rem; left: 0;
+            width: 4.4rem; height: 3px; background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: 2px;
+        }
+        h3 { font-size: clamp(1.05rem, 0.95rem + 0.6vw, 1.35rem); font-weight: 600; margin: 1.2rem 0 0.6rem; }
+        p { color: var(--text-secondary); text-wrap: pretty; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            padding: clamp(1rem, 1.2rem + 1vw, 2rem);
+            margin: 1.2rem 0;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: transform var(--d-med) var(--ease-emph), box-shadow var(--d-med) var(--ease-standard), background var(--d-fast) var(--ease-standard), border-color var(--d-fast) var(--ease-standard);
+            will-change: transform;
+            position: relative;
+            overflow: clip;
+            perspective: 800px; /* for subtle 3D tilt */
+        }
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: var(--shadow-md);
+            border-color: color-mix(in oklab, var(--primary-color) 18%, var(--border-color));
+        }
+        .card::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(600px 200px at var(--mx, 50%) var(--my, 0%), color-mix(in oklab, var(--primary-color) 10%, transparent), transparent 60%);
+            opacity: 0; transition: opacity var(--d-fast) var(--ease-standard); pointer-events: none;
+        }
+        .card:hover::before { opacity: 1; }
+
+        /* Interactive */
+        .interactive {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.06), rgba(139, 92, 246, 0.06));
+            border: 1px dashed color-mix(in oklab, var(--primary-color) 60%, var(--border-color));
+        }
+
+        /* Formula box */
+        .formula-box {
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(17, 24, 39, 0.6));
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--primary-color);
+            padding: 1.25rem; margin: 1.2rem 0;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            border-radius: var(--radius-lg);
+            color: var(--text-primary);
+            position: relative; overflow: auto;
+        }
+        .formula-box::before { content: '📐'; position: absolute; top: 0.5rem; right: 0.7rem; opacity: 0.85; }
+
+        /* Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(1rem, 2vw, 2rem);
+            margin-block: 1rem;
+        }
+
+        /* Buttons */
+        .btn, .control-btn {
+            position: relative; display: inline-flex; align-items: center; gap: 0.55rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #fff; padding: 0.72rem 1.2rem; border: none; border-radius: 999px; font-weight: 600; cursor: pointer;
+            box-shadow: 0 10px 30px rgba(99,102,241,0.35);
+            transition: transform var(--d-fast) var(--ease-emph), box-shadow var(--d-fast) var(--ease-standard), filter var(--d-fast) var(--ease-standard);
+            overflow: hidden;
+        }
+        .btn:hover, .control-btn:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(99,102,241,0.45); filter: brightness(1.02); }
+        .btn:active, .control-btn:active { transform: translateY(0); box-shadow: 0 8px 22px rgba(99,102,241,0.35); }
+
+        /* Tables (content preserved; enhanced style) */
+        table {
+            width: 100%; border-collapse: collapse; background: rgba(31, 41, 55, 0.5);
+            text-align: left; border: 1px solid var(--border-color);
+            border-radius: var(--radius-md); overflow: hidden; color: var(--text-primary);
+        }
+        th, td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--border-color); }
+        th { background: color-mix(in oklab, var(--primary-color) 20%, var(--bg-tertiary)); color: #fff; }
+        tr:last-child td { border-bottom: none; }
+        .red-dot { color: #ff5252; font-weight: 700; }
+
+        /* Prior cards */
+        .prior-types {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem; margin: 1rem 0;
+        }
+        .prior-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #fff; padding: 1.4rem; border-radius: var(--radius-xl); text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .prior-card::before {
+            content: ''; position: absolute; inset: -40% -20%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.15), transparent);
+            transform: rotate(30deg); animation: sweep 3.2s var(--ease-standard) infinite;
+        }
+        @keyframes sweep { 0% { transform: translateX(-40%) rotate(30deg); } 100% { transform: translateX(140%) rotate(30deg); } }
+
+        /* Drawing board */
+        #drawing-board { padding: 0; }
+        .drawing-container { min-height: 100svh; display: flex; flex-direction: column; }
+        .canvas-wrapper { flex: 1; position: relative; background: #fff; border: 1px solid var(--border-color); box-shadow: var(--shadow-sm); }
+        #drawingCanvas { position: absolute; inset: 0; touch-action: none; cursor: crosshair; }
+        .drawing-controls {
+            display: flex; flex-wrap: wrap; gap: 0.75rem; padding: 1rem; justify-content: center; align-items: center;
+            background: var(--bg-primary); border-top: 1px solid var(--border-color);
+        }
+        .color-picker { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .color-option {
+            width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid transparent;
+            transition: transform var(--d-fast) var(--ease-standard), border-color var(--d-fast) var(--ease-standard), box-shadow var(--d-fast) var(--ease-standard);
+        }
+        .color-option:hover, .color-option.active { transform: scale(1.15); border: 2px solid #fff; box-shadow: 0 0 0 2px var(--primary-color); }
+        .brush-size { width: 110px; }
+        .color-black { background-color: #000; }
+        .color-red { background-color: #e53e3e; }
+        .color-blue { background-color: #3182ce; }
+        .color-green { background-color: #38a169; }
+        .color-purple { background-color: #805ad5; }
+        .color-yellow { background-color: #ecc94b; }
+
+        /* Footer */
+        footer {
+            background: rgba(31, 41, 55, 0.5);
+            border-top: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2.5rem;
+        }
+
+        /* IMPORTANT: Reveal classes now DO NOT hide by default.
+           Content is visible even if JS/GSAP fails. */
+        .will-reveal { /* no default hiding */ }
+        .mask-reveal > * { /* no default transform */ }
+        .is-visible { /* utility, kept for compatibility */ }
+
+        /* CSS Scroll-Driven Animations (progressive enhancement) */
+        @supports (animation-timeline: view()) {
+            /* fade+slide for cards */
+            section .card {
+                animation-name: fadeSlideIn;
+                animation-duration: 1s;
+                animation-fill-mode: both;
+                animation-timing-function: var(--ease-emph);
+                animation-timeline: view();
+                animation-range: entry 10% cover 30%;
+            }
+            @keyframes fadeSlideIn {
+                from { opacity: 0; transform: translateY(28px) scale(0.98); }
+                to   { opacity: 1; transform: translateY(0) scale(1); }
+            }
+            /* mask-reveal heading text */
+            .mask-reveal span {
+                --clip: inset(100% 0 0 0);
+                animation: textUnmask 1.2s var(--ease-emph) both;
+                animation-timeline: view();
+                animation-range: entry 0% cover 20%;
+            }
+            @keyframes textUnmask {
+                from { clip-path: inset(100% 0 0 0); opacity: 0; transform: translateY(24px); }
+                to   { clip-path: inset(0 0 0 0); opacity: 1; transform: translateY(0); }
+            }
+        }
+
+        /* Print */
+        @media print {
+            .controls-wrap, .progress-bar, .nav-trigger, nav { display: none !important; }
+            section { page-break-after: always; padding-top: 2rem; }
+            .card:hover { transform: none !important; }
+            .btn { display: none !important; }
+            footer { page-break-after: avoid; }
+        }
+    </style>
+
+    <!-- If JS is disabled, everything is already visible; no extra styles required -->
+    <noscript></noscript>
+</head>
+<body>
+    <!-- Ambient layers -->
+    <div class="dynamic-bg" aria-hidden="true"></div>
+    <div class="gradient-flow" aria-hidden="true"></div>
+    <div class="ambient-canvas-wrap" aria-hidden="true">
+        <canvas id="ambientCanvas"></canvas>
+    </div>
+
+    <!-- Top controls -->
+    <div class="controls-wrap">
+        <button class="control-icon" id="themeToggle" title="Toggle Dark/Light">
+            <i class="fas fa-moon"></i>
+        </button>
+        <button class="control-icon" id="soundToggle" title="Ambient sound (subtle)" aria-pressed="false">
+            <i class="fas fa-volume-mute"></i>
+        </button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Navigation Trigger & Nav -->
+    <div class="nav-trigger">
+        <div class="nav-indicator"></div>
+    </div>
+
+    <nav>
+        <ul>
+            <li><a href="#intro" class="nav-link active"><i class="fas fa-home"></i> Introduction</a></li>
+            <li><a href="#bayesian-pe" class="nav-link"><i class="fas fa-calculator"></i> Bayesian Point Estimation</a></li>
+            <li><a href="#prior" class="nav-link"><i class="fas fa-layer-group"></i> Prior</a></li>
+            <li><a href="#likelihood" class="nav-link"><i class="fas fa-chart-bar"></i> Likelihood</a></li>
+            <li><a href="#bayes-theorem" class="nav-link"><i class="fas fa-project-diagram"></i> Bayes Theorem</a></li>
+            <li><a href="#posterior" class="nav-link"><i class="fas fa-bullseye"></i> Posterior</a></li>
+            <li><a href="#loss" class="nav-link"><i class="fas fa-balance-scale"></i> Loss Function</a></li>
+            <li><a href="#estimators" class="nav-link"><i class="fas fa-cogs"></i> Types of Estimators</a></li>
+            <li><a href="#drawing-board" class="nav-link"><i class="fas fa-pencil-alt"></i> Drawing Board</a></li>
+            <li><a href="#conclusion" class="nav-link"><i class="fas fa-flag-checkered"></i> Conclusion</a></li>
+        </ul>
+    </nav>
+
+    <!-- Sections (ORIGINAL CONTENT fully preserved) -->
+    <!-- INTRO -->
+    <section id="intro" data-bg="intro">
+        <h1 class="mask-reveal"><span>Introduction to Bayesian Point Estimation</span></h1>
+        <div class="card will-reveal">
+            <p> In statistics, we often have unknown values called parameters,
+ like the true mean or proportion of a population.
+ But since we can’t measure the whole population,
+ we take a sample and calculate values like the sample mean
+ to approximate the true value — this process is called 
+estimation.</p>
+
+            <h3> Old Scientist when starting using Statistics they differ in 
+the way they think about Probability</h3>
+            <p> • Some people see probability as the frequency of an event 
+when the experiment is repeated many times (frequentists).</p>
+            <p>     • On other hand, [Bayesian] view consider probability as a 
+measure of belief or uncertainty about an event, which can 
+be updated when new information becomes available.
+</p>
+            <h1>1.The Frequentist Approach to Probability</h1>
+            <div class="card will-reveal">
+                <table>
+                    <tr>
+                        <th>Number of rolls</th>
+                        <th>times we got 6</th>
+                        <th>relative frequency</th>
+                    </tr>
+                    <tr>
+                        <td>100</td>
+                        <td>11</td>
+                        <td>0.11</td>
+                    </tr>
+                    <tr>
+                        <td>200</td>
+                        <td>28</td>
+                        <td>0.14</td>
+                    </tr>
+                    <tr>
+                        <td>300</td>
+                        <td>50</td>
+                        <td>0.1667</td>
+                    </tr>
+                    <tr>
+                        <td>500</td>
+                        <td>84</td>
+                        <td>0.168</td>
+                    </tr>
+                    <tr>
+                        <td>600</td>
+                        <td>100 <span class="red-dot">•</span></td>
+                        <td>0.1667</td>
+                    </tr>
+                    <tr>
+                        <td>700</td>
+                        <td>115</td>
+                        <td>0.1643</td>
+                    </tr>
+                </table>
+            </div>
+
+            <p> So probability here is limiting value of the relative frequency when 
+number of trials become very large</p>
+            <h1>2.The Bayesian Approach to Probability</h1>
+            <p> Let's suppose you have fair die and before rolling it you believe it is 
+fair, meaning every side has a probability 1/6
+ This belief is called Prior Probability.</p>
+            <p> You are given data showing that when the dice was rolled 60 
+times, the number 6 appeared 16 time , That’s more than 
+expected for a fair dice (which should be about 10 times if it’s 
+fair)
+ Using Bayes’ theorem you now update your belief _maybe the 
+dice is not fair 
+Now belief after seeing data called posterior probability</p>
+            <div class="interactive card will-reveal">
+                <h3>Why Bayesian Methods?</h3>
+                <p>Bayesian methods offer several advantages:</p>
+                <ul>
+                    <li>Incorporation of prior knowledge</li>
+                    <li>Quantification of uncertainty</li>
+                    <li>Natural interpretation of results</li>
+                    <li>Coherent framework for decision making</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- BAYESIAN PE -->
+    <section id="bayesian-pe" data-bg="pe">
+        <h1 class="mask-reveal"><span>Bayesian Point Estimation</span></h1>
+        <div class="card will-reveal">
+            <p>Bayesian point estimation is a method of estimating unknown parameters by finding a single "best" value from the posterior distribution. This approach combines prior beliefs about the parameter with information from observed data.</p>
+
+            <h2>Key Concepts <span class="underline"></span></h2>
+            <p>In Bayesian point estimation, we:</p>
+            <ul>
+                <li>Start with a prior distribution representing our initial beliefs</li>
+                <li>Update these beliefs using observed data through the likelihood</li>
+                <li>Obtain a posterior distribution</li>
+                <li>Choose a point estimate from this posterior based on a loss function</li>
+            </ul>
+
+            <div class="formula-box">
+                Posterior ∝ Likelihood × Prior
+                <br />
+                π(θ|x) ∝ L(x|θ) × π(θ)
+            </div>
+
+            <h2>The Bayesian Workflow <span class="underline"></span></h2>
+            <ol>
+                <li><strong>Specify the model:</strong> Choose likelihood and prior</li>
+                <li><strong>Compute posterior:</strong> Apply Bayes' theorem</li>
+                <li><strong>Choose estimator:</strong> Select based on loss function</li>
+                <li><strong>Make inference:</strong> Report point estimate and uncertainty</li>
+            </ol>
+        </div>
+    </section>
+
+    <!-- BAYES THEOREM -->
+    <section id="bayes-theorem" data-bg="bayes">
+        <h1 class="mask-reveal"><span>Bayes' Theorem</span></h1>
+        <div class="card will-reveal">
+            <p>Bayes' theorem is the mathematical foundation of Bayesian inference, providing a way to update probabilities based on new evidence.</p>
+
+            <div class="formula-box">
+                P(θ|X) = [P(X|θ) × P(θ)] / P(X)
+                <br /><br />
+                Where:
+                <br />- P(θ|X) = Posterior probability
+                <br />- P(X|θ) = Likelihood
+                <br />- P(θ) = Prior probability
+                <br />- P(X) = Marginal likelihood (evidence)
+            </div>
+
+            <h2>Components Explained <span class="underline"></span></h2>
+            <div class="grid">
+                <div class="card will-reveal">
+                    <h3>Prior P(θ)</h3>
+                    <p>Our belief about θ before seeing data</p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Likelihood P(X|θ)</h3>
+                    <p>Probability of observing X given θ</p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Posterior P(θ|X)</h3>
+                    <p>Updated belief about θ after seeing data</p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Evidence P(X)</h3>
+                    <p>Normalizing constant ensuring valid probability</p>
+                </div>
+            </div>
+
+            <h2>Example: Coin Flipping <span class="underline"></span></h2>
+            <div class="interactive card will-reveal">
+                <p>Suppose we want to estimate the probability θ of getting heads:</p>
+                <ul>
+                    <li>Prior: θ ~ Beta(α=2, β=2) (slightly informative)</li>
+                    <li>Data: 7 heads in 10 flips</li>
+                    <li>Likelihood: Binomial(n=10, k=7, θ)</li>
+                    <li>Posterior: θ|X ~ Beta(α=9, β=5)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRIOR -->
+    <section id="prior" data-bg="prior">
+        <h1 class="mask-reveal"><span>Prior Distributions</span></h1>
+        <h2>Introduction: <span class="underline"></span></h2>
+        <div class="card will-reveal">
+            <p><strong>The difference between classical statistics and Bayesian statistics:</strong></p>
+            <p>-classical statistics:ِ Assumes there is one fixed unknown truth to be found.</p>
+            <p>-bayesain statistics:treats truth as a belief that is updating with new evidence.</p>
+            <div class="card will-reveal">
+                <h3->In the Bayesian world everything starts not with data but with a belief(prior distribution).</h3>
+            </div>
+            <div class="card will-reveal">
+                <h3->->updating data is the core idea to Bayesian statistics and can be used to test hypothesis.</h3>
+            </div>
+
+            <h2>Prior Distribution: <span class="underline"></span></h2>
+            <p>(formal way to state your educated guess about something before you have seen any of the evidence or it is an initial assumption) our belief about a parameter before observing any data.It is the starting point of analysis.</p>
+
+            <div class="card will-reveal">
+                <h2>Types of Priors</h2>
+                <div class="card will-reveal">
+                    <h3>• Informative prior</h3>
+                    <p> is a probability distribution that incorporates existing Knowledge,like listening to an expert opinion or results from a previous study. </p>
+                    <p><strong>Common Informative prior</strong></p>
+                    <ol type="1">
+                        <li>Normal:for parameters concentrated around a central values.</li>
+                        <li>Beta:for probability or proportion between 0 and 1.</li>
+                        <li>Gamma:for positive parameters.</li>
+                    </ol>
+                </div>
+                <div class="card will-reveal">
+                    <h3>• Non-informative Prior</h3>
+                    <p>Designed to have minimal influence on the posterior distribution when there is little prior knowledge.</p>
+                    <p><strong>Common Uninformative prior</strong></p>
+                    <ol type="1">
+                        <li>uniform</li>
+                        <li>jeffery's</li>
+                        <li>reference</li>
+                        <li>improper</li>
+                    </ol>
+                </div>
+                <div class="card will-reveal">
+                    <h3>• Conjugate prior</h3>
+                    <p>A conjugate prior is a prior distribution selected so that, when combined with the likelihood function of the data through Bayes’ theorem, the resulting posterior distribution belongs to the same family of distributions as the prior.</p>
+                    <p><strong>Common Uninformative prior</strong></p>
+                    <ol type="1">
+                        <li>uniform</li>
+                        <li>jeffery's</li>
+                        <li>reference</li>
+                        <li>improper</li>
+                    </ol>
+                    <p>Examples of common conjugate pairs:</p>
+                    <table id="pairs">
+                        <tr>
+                            <th>prior distribution</th>
+                            <th>likelihood function</th>
+                            <th>posterior distribution</th>
+                        </tr>
+                        <tr>
+                            <td>Beta prior</td>
+                            <td>Binomial</td>
+                            <td>Beta</td>
+                        </tr>
+                        <tr>
+                            <td>Gamma prior</td>
+                            <td>Poisson</td>
+                            <td>Gamma</td>
+                        </tr>
+                        <tr>
+                            <td>Normal prior</td>
+                            <td>Normal (with known mean and variance)</td>
+                            <td>Normal</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <h2>Prior Elicitation Methods <span class="underline"></span></h2>
+                <ul>
+                    <li><strong>Expert Opinion:</strong> Translate domain knowledge into probability distributions</li>
+                    <li><strong>Historical Data:</strong> Use previous studies to inform prior</li>
+                    <li><strong>Reference Priors:</strong> Maximize the influence of data (Jeffreys, Reference)</li>
+                    <li><strong>Empirical Bayes:</strong> Estimate prior parameters from the data</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- LIKELIHOOD -->
+    <section id="likelihood" data-bg="likelihood">
+        <h1 class="mask-reveal"><span>Likelihood Function</span></h1>
+        <div class="card will-reveal">
+            <p>The likelihood function L(θ|x) represents the probability of observing the data x given a specific parameter value θ. It serves as the bridge between the parameter and the observed data.</p>
+
+            <h2>Properties of Likelihood <span class="underline"></span></h2>
+            <ul>
+                <li><strong>Not a probability distribution:</strong> Does not integrate to 1 over θ</li>
+                <li><strong>Relative measure:</strong> Only ratios of likelihood values are meaningful</li>
+                <li><strong>Data fixed:</strong> Likelihood is a function of θ with data held constant</li>
+                <li><strong>Maximum Likelihood:</strong> The θ value that maximizes L(θ|x)</li>
+            </ul>
+
+            <h2>Common Likelihood Functions <span class="underline"></span></h2>
+            <div class="grid">
+                <div class="card will-reveal">
+                    <h3>Binomial</h3>
+                    <p>For binary outcomes</p>
+                    <div class="formula-box">$$L(p \mid k) = \binom{n}{k} p^k (1-p)^{n-k}$$</div>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Poisson</h3>
+                    <p>For count data</p>
+                    <div class="formula-box">$$ P(X = x \mid \lambda) = \frac{e^{-\lambda}\lambda^x}{x!} $$</div>
+                </div>
+            </div>
+
+            <div class="card will-reveal" style="margin-top:2rem;">
+                <h2 style="font-size:1.3rem; text-align:left; margin-bottom:1rem;
+                    background-clip:text; -webkit-background-clip:text; color:transparent;
+                    background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+                    Explore Interactive Desmos Calculators
+                </h2>
+                <div id="desmos-links" style="margin-bottom:1.5rem;">
+                    <button class="calc-link btn" data-url="https://www.desmos.com/calculator/ojuqrilq1y">Binomial Distribution</button>
+                    <button class="calc-link btn" data-url="https://www.desmos.com/calculator/vy8ebiqzqd">Binomial likelihood</button>
+                    <button class="calc-link btn" data-url="https://www.desmos.com/calculator/jwbuu46ltj">Uniform Distribution</button>
+                    <button class="calc-link btn" data-url="https://www.desmos.com/calculator/ketofvlp3i">Beta Distribution</button>
+                </div>
+                <div id="iframeContainer" style="width:100%; max-width:900px; height:600px; border:2px solid #8b5cf6; border-radius:12px; overflow:hidden; background:#fff; display:none;">
+                    <iframe id="calculatorFrame" src="" style="width:100%; height:100%; border:none;" allowfullscreen loading="lazy" referrerpolicy="no-referrer"></iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- POSTERIOR -->
+    <section id="posterior" data-bg="posterior">
+        <h1 class="mask-reveal"><span>Posterior Distribution</span></h1>
+        <div class="card will-reveal">
+            <p>The updated belief after considering both prior information and observed data.<br>
+                we apply Bayes' theorem to update data:<br>
+                <center>P(A | B) = P(B | A) *  P(A) / P(B)</center>
+                P(A): the probability of my belief.<br>
+                P(B): the probability of the observed data.<br>
+                P(B|A):the likelihood of the observed data.<br>   
+            </p>
+            <h2>Example <span class="underline"></span></h2>
+            <p>you want to know the probability that your sister's friend is male, given you know that friend has breast cancer.using Bayes' theorem we can calculate this probability:</p>
+            <div style="text-align: center; margin-top: 2rem;">
+                <strong>Solution:</strong>
+            </div>
+            <div class="formula-box">
+                <pre>P (male | breast cancer)=P (breast cancer | male) * P (male) / P (breast cancer)</pre>
+                <p>from government health agencies we know that:</p>
+                <p>P (breast cancer | male)=0.001                (the probability of getting breast cancer given you're male)</p>
+                <p>P (breast cancer)=0.063                             (the overall probability of getting breast cancer)</p>
+                <p>and our assumption or belief that:</p>
+                <p>P (male)=0.5</p>
+                <p>P (male | breast cancer)=0.001 *0.5/0.063 =0.79%</p>
+                <p><strong>we updated our belief that the person was male (50% if you don't know anything else about them) with new information that they had breast cancer.</strong></p>
+                <p><strong>this new information changed our belief from 50% to 0.79%.</strong></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- LOSS -->
+    <section id="loss" data-bg="loss">
+        <h1 class="mask-reveal"><span>Loss Functions</span></h1>
+        <h2>Definition: <span class="underline"></span></h2>
+        <div class="card will-reveal">
+            <p>A <strong>loss function</strong> 𝐿(𝜃,𝜃̂)measures how far an estimated value 𝜃̂
+ ̂is from the true (but unknown) parameter 𝜃. 
+It quantifies the cost of making an incorrect prediction or 
+estimation.
+             <p>• If 𝜃̂ = 𝜃→ <strong>Loss = 0</strong> (perfect estimate). </p>
+            <p>• If 𝜃̂is far from 𝜃→ <strong>Loss is large</strong> (poor estimate).</p>
+            </p>
+           <p>The main goal of any statistical or machine learning model is 
+to <strong>minimize the loss</strong>, 
+thereby improving accuracy and performance.</p>
+            <h2>Common Loss Functions <span class="underline"></span></h2>
+            <p>Different problems require different types of loss functions. 
+The most widely used include: </p>
+            <div class="grid">
+                <div class="card will-reveal">
+                    <h3>1-Quadratic(Squared Error) Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = (θ - θ̂)²</div>
+                    <p>• Penalizes large errors more heavily.</p>
+                    <p>• Commonly used in <strong>regression</strong> and Bayesian estimation.</p>
+                    <p><strong>Example:</strong></p>
+                    <p>If the true weight is 70 kg and the model predicts 75 kg: <center>L=(70−75)2 = 25</center></p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>2-Absolute Error Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = |θ - θ̂|</div>
+                    <p>• Penalizes errors linearly (not squared).</p>
+                    <p>• Less sensitive to outliers — more robust.</p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>3-Zero-One (0–1) Loss</h3>
+                    <div class="formula-box">L(θ, θ̂) = 0 if |θ-θ̂|&lt;ε, 1 otherwise</div>
+                    <p>• Used mainly in <strong>classification problems.</strong></p>
+                    <p>• Simply checks if the prediction is correct or not.</p>
+                </div>
+            </div>
+
+            <h2>Bayesian View <span class="underline"></span></h2>
+            <p>Since 𝜃 is unknown, we minimize the <strong>expected posterior loss:</strong></p>
+            <center><p>p(𝜃̂) = 𝐸[𝐿(𝜃,𝜃̂) ∣ 𝑥] = ∫𝐿(𝜃,𝜃̂)𝜋(𝜃 ∣ 𝑥) 𝑑𝜃</p></center>
+            <p>π(𝜃 ∣ 𝑥): posterior distribution </p>
+            <p>p(𝜃̂): average loss under the posterior</p>
+
+            <h2>Bayesian estimator: <span class="underline"></span></h2>
+            <center><p>𝜃̂(𝑥) = arg⁡ min 𝑎 p(𝑎)</p></center>
+            <h2>Example <span class="underline"></span></h2>
+
+            <p>Suppose the posterior distribution of \(\theta\) is:</p>
+
+            <div class="math-block formula-box">
+                \[
+                \pi(\theta \mid x) =
+                \begin{cases}
+                    2\theta, & 0 \leq \theta \leq 1 \\
+                    0, & \text{otherwise}
+                \end{cases}
+                \]
+            </div>
+
+            <p>and \( L(\theta, \hat{\theta}) = (\theta - \hat{\theta})^2 \):</p>
+
+            <div class="math-block formula-box">
+                \[
+                \rho(\hat{\theta}) = \int_0^1 (\theta - \hat{\theta})^2 [2\theta] \, d\theta 
+                = \frac{1}{2} - \frac{4\hat{\theta}}{3} + \hat{\theta}^2
+                \]
+            </div>
+
+            <p>Differentiate and set to zero (to get minimize):</p>
+
+            <div class="math-block formula-box">
+                \[
+                \frac{d\rho}{d\hat{\theta}} = 2\hat{\theta} - \frac{4}{3} = 0 
+                \Rightarrow \hat{\theta} = \frac{2}{3}
+                \]
+            </div>
+
+            <h2>Applications of Loss Functions <span class="underline"></span></h2>
+            <p>Different problems require different types of loss functions. 
+The most widely used include: </p>
+            <div class="grid">
+                <div class="card will-reveal">
+                    <h3>Regression Models: </h3>
+                    <p>
+                        Predict continuous values.
+                        <p>• L2 Loss: 𝐿 = (𝑡𝑟𝑢𝑒 −𝑝𝑟𝑒𝑑𝑖𝑐𝑡𝑒𝑑)^2 → penalizes large errors.</p>
+                        <p>• L1 Loss: 𝐿 =∣ 𝑡𝑟𝑢𝑒 − 𝑝𝑟𝑒𝑑𝑖𝑐𝑡𝑒𝑑 ∣ → robust to outliers.</p>
+                    </p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Classification Models:</h3>
+                    <p>
+                        Predict discrete labels.
+                        <p>• 0–1 Loss: 𝐿 = 0if correct, 1if wrong.</p>
+                        <p>• Cross-Entropy Loss: compares predicted probabilities with actual outcomes; penalizes confident wrong predictions..</p>
+                    </p>
+                </div>
+                <div class="card will-reveal">
+                    <h3>Risk Analysis: </h3>
+                    Measures expected cost of errors.<br> R(𝜃̂) = 𝐸[𝐿(𝜃,𝜃̂)]<br>Smaller risk → better decision.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ESTIMATORS -->
+    <section id="estimators" data-bg="estimators">
+        <h1 class="mask-reveal"><span>Types of Bayesian Point Estimators</span></h1>
+        <div class="card will-reveal">
+            <p>Bayesian point estimation aims to estimate an unknown parameter (θ) using both data and prior knowledge. Each estimator provides a different way to summarize what we believe about θ after observing data. Here we discuss four main estimators: MLE, MAP, Posterior Mean, and Posterior Median. They differ in how much they rely on data versus prior belief and which loss function they minimize.</p>
+
+            <h2>1. Posterior Mean Estimator <span class="underline"></span></h2>
+            <div class="card will-reveal">
+                <h3>Definition</h3>
+                <p>This estimator is the "expected value of θ" given the posterior distribution. It minimizes the "average squared error", giving a balanced and smooth estimate.</p>
+
+                <ul>
+                    <li><strong>Loss Function Relation:</strong>Minimizes squared error loss.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong>Uses the entire posterior distribution.</li>
+                    <li><strong>Why We Use It:</strong>Provides stable and average performance.</li>
+                </ul>
+
+                <h3>When to Use</h3>
+                <p>Best when errors in both directions are equally important and you want to minimize average squared error.</p>
+            </div>
+
+            <h2>2. Posterior Median Estimator <span class="underline"></span></h2>
+            <div class="card will-reveal">
+                <h3>Definition</h3>
+                <p>The posterior median splits the posterior distribution into two equal halves — half the probability lies on each side. It is "robust" to outliers and skewed distributions.</p>
+                <ul>
+                    <li><strong>Loss Function Relation:</strong>Minimizes absolute error loss.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong> Based on cumulative posterior , consider&nbsp;prior</li>
+                    <li><strong>Why We Use It:</strong>Less sensitive to extreme values or asymmetry.</li>
+                </ul>
+
+                <h3>When to Use</h3>
+                <p>When the posterior is skewed or under absolute loss.</p>
+            </div>
+
+            <h2>3. MAP Estimator (Maximum A Posteriori) <span class="underline"></span></h2>
+            <div class="card will-reveal">
+                <h3>Definition</h3>
+                <p>MAP combines both prior information and observed data. It finds the parameter value that "maximizes the posterior" (Prior×Likelihood).</p>
+                <ul>
+                    <li><strong>Loss Function Relation:</strong>Also minimizes 0−1 loss, but under the posterior.</li>
+                    <li><strong>Relation to Prior & Posterior:</strong>Includes both; prior affects results when data is limited.</li>
+                    <li><strong>Why We Use It:</strong>It balances data with prior knowledge.</li>
+                </ul>
+                <h3>When to Use</h3>
+                <p>When we have small data samples or trusted prior beliefs.</p>
+            </div>
+
+            <h2>4. Maximum Likelihood Estimator (MLE) <span class="underline"></span></h2>
+            <div class="card will-reveal">
+                <p>MLE chooses the parameter value that makes the observed data most likely. It depends "only on the data", not on any prior belief.</p>
+
+                <ul>
+                    <li><strong>Loss Function Relation:</strong>Minimizes 0−1 loss (chooses the most likely θ).</li>
+                    <li><strong>Relation to Prior & Posterior:</strong> Uses only the likelihood, ignores prior knowledge.</li>
+                    <li><strong>Why We Use It:</strong>Simple and purely data-driven.</li>
+                </ul>
+                <h3>When to Use</h3>
+                <p>When there is enough data and no strong prior belief.</p>
+            </div>
+
+            <!-- Tables retained -->
+            <table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+                <caption style="text-align:left; font-size:1.2rem; font-weight:600; margin-bottom:0.7rem;
+                    background:#e5e7eb; padding:0.7rem 0;
+                    background-clip:text;
+                    -webkit-background-clip:text;
+                    color:transparent;
+                    background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+                    Comparison Between MLE and MAP
+                </caption>
+                <thead style="background:#e5e7eb;">
+                    <tr>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Feature</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">MLE</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">MAP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Uses Prior?</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">No</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Based On</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Likelihood</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior (Prior × Likelihood)</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Depends On</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data only</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data + Prior</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Works Best When</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data is large and reliable</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Data is limited or prior is strong</td>
+                    </tr>
+                    <tr>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Output Tendency</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Purely data-driven</td>
+                        <td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Smoothed by prior belief</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+                <caption style="text-align:left; font-size:1.2rem; font-weight:600; margin-bottom:0.7rem;
+                    background:#e5e7eb; padding:0.7rem 0;
+                    background-clip:text;
+                    -webkit-background-clip:text;
+                    color:transparent;
+                    background-image:linear-gradient(90deg,#8b5cf6,#6366f1);">
+                    Summary Table of All Four Estimators
+                </caption>
+                <thead style="background:#e5e7eb;">
+                    <tr>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Estimator</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Uses Prior?</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Loss Function</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Best When</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Main Idea</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MLE</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">No</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0–1 Loss</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Large Data</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Choose θ maximizing likelihood</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MAP</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0–1 Loss</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Limited Data</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Choose θ maximizing posterior</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Mean</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Squared Error</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Average performance needed</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Take mean of posterior</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Median</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Yes</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Absolute Error</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior skewed or outliers</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Take median of posterior</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Example (Dice Problem) <span class="underline"></span></h2>
+            <p><strong>Suppose we roll a fair die and want to estimate the probability θ of getting a "6". We roll the die 10 times and observe 3 sixes. We assume a prior distribution Beta(2,2) for θ. Then, the posterior becomes Beta(5,9), which expresses our updated belief about θ after observing data.</strong></p>
+            <h3>Posterior Distribution:</h3>
+            <p><strong>Using Bayes' theorem:</strong></p>
+            <div class="formula-box">
+                $$
+    p(\theta|\text{data}) \propto \theta^{x+\alpha-1}(1-\theta)^{n-x+\beta-1}
+    $$
+            </div>
+            <pre><strong>Here α=2, β=2, n=10, x=3 → Posterior =Beta(5,9).
+
+            We can now find different estimators numerically:</strong></pre>
+
+            <table style="width:100%; border-collapse:collapse; margin:2rem 0; font-family:Inter, Arial, sans-serif; background:#f9fafb; border:1px solid #4b5563; color:#000;">
+                <thead style="background:#e5e7eb;">
+                    <tr>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Estimator</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Formula</th>
+                        <th style="border:1px solid #4b5563; padding:0.7rem; text-align:left; color:#000;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Mean</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">a / (a + b)</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.357</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Posterior Median</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">Approx: (a–1/3)/(a+b–2/3)</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">≈ 0.35</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MAP</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">(a–1)/(a+b–2)</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.333</td></tr>
+                    <tr><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">MLE</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">x / n</td><td style="border:1px solid #4b5563; padding:0.7rem; color:#000;">0.3</td></tr>
+                </tbody>
+            </table>
+
+            <ul>
+                <li><strong>Posterior Mean:</strong>It's the expected value of θ under the posterior distribution. It minimizes the squared error loss and gives a balanced estimate.</li>
+                <li><strong>Posterior Median:</strong> It divides the posterior distribution into two equal halves and minimizes the absolute error loss.</li>
+                <li><strong>MAP (Maximum A Posteriori):</strong>It's the mode (peak) of the posterior distribution. It gives the most probable value of θ after observing data.</li>
+                <div class="card">Note: As the sample size increases, the MAP estimator gets closer to the MLE because the likelihood becomes much stronger than the prior.</div>
+                <li><strong>MLE (Maximum Likelihood Estimator):</strong>It maximizes only the likelihood p(data∣θ) without considering the prior. It ignores prior beliefs.</li>
+            </ul>
+            <p><strong>When to Use:</strong></p>
+            <ul>
+                <li>Use Posterior Mean when minimizing average squared error is important.</li>
+                <li>Use Median for robust estimation with less sensitivity to outliers.</li>
+                <li>Use MAP when you want the most probable single estimate given both prior and data.</li>
+                <li>Use MLE when there is no prior knowledge or when the sample size is large (posterior ≈ likelihood).</li>
+            </ul>
+            <div class="card will-reveal">
+                <img src="https://raw.githubusercontent.com/Mon3mRT/Mon3mRT.github.io/refs/heads/main/Screenshot%202025-10-15%20230917.jpg" alt="Estimators visualization" style="width:100%;height:auto;border-radius:12px;display:block" loading="lazy" decoding="async" />
+            </div>
+        </div>
+    </section>
+
+    <!-- APPLICATIONS -->
+    <section id="applications" data-bg="applications">
+        <h1 class="mask-reveal"><span>Applications of Bayesian Point Estimation</span></h1>
+        <div class="card will-reveal">
+            <p>Bayesian point estimation has wide-ranging applications across various fields. Here are some key areas where these methods excel.</p>
+
+            <div class="grid">
+                <div class="card will-reveal">
+                    <h3>🏥 Medical Diagnosis</h3>
+                    <p><strong>Disease Prevalence Estimation</strong></p>
+                    <ul>
+                        <li>Prior: Historical disease rates</li>
+                        <li>Data: Test results from patients</li>
+                        <li>Estimate: Updated disease probability</li>
+                    </ul>
+                    <p>Used in diagnostic tests, clinical trials, and epidemiology.</p>
+                </div>
+
+                <div class="card will-reveal">
+                    <h3>💰 Finance & Risk</h3>
+                    <p><strong>Portfolio Optimization</strong></p>
+                    <ul>
+                        <li>Prior: Market beliefs, expert opinions</li>
+                        <li>Data: Historical returns</li>
+                        <li>Estimate: Expected returns and volatility</li>
+                    </ul>
+                    <p>Applied in asset allocation, option pricing, and credit risk.</p>
+                </div>
+
+                <div class="card will-reveal">
+                    <h3>🤖 Machine Learning</h3>
+                    <p><strong>Hyperparameter Tuning</strong></p>
+                    <ul>
+                        <li>Prior: Domain knowledge about parameters</li>
+                        <li>Data: Model performance metrics</li>
+                        <li>Estimate: Optimal hyperparameters</li>
+                    </ul>
+                    <p>Used in neural networks, Gaussian processes, and Bayesian optimization.</p>
+                </div>
+
+                <div class="card will-reveal">
+                    <h3>🔬 Scientific Research</h3>
+                    <p><strong>Parameter Estimation in Physics</strong></p>
+                    <ul>
+                        <li>Prior: Theoretical predictions</li>
+                        <li>Data: Experimental measurements</li>
+                        <li>Estimate: Physical constants</li>
+                    </ul>
+                    <p>Applied in cosmology, particle physics, and climate modeling.</p>
+                </div>
+
+                <div class="card will-reveal">
+                    <h3>📊 A/B Testing</h3>
+                    <p><strong>Conversion Rate Optimization</strong></p>
+                    <ul>
+                        <li>Prior: Historical conversion rates</li>
+                        <li>Data: User interaction data</li>
+                        <li>Estimate: True conversion rates</li>
+                    </ul>
+                    <p>Used in web optimization, marketing campaigns, and UX design.</p>
+                </div>
+
+                <div class="card will-reveal">
+                    <h3>🏭 Quality Control</h3>
+                    <p><strong>Defect Rate Estimation</strong></p>
+                    <ul>
+                        <li>Prior: Manufacturing specifications</li>
+                        <li>Data: Inspection results</li>
+                        <li>Estimate: True defect rate</li>
+                    </ul>
+                    <p>Applied in manufacturing, supply chain, and process improvement.</p>
+                </div>
+            </div>
+
+            <h2>Case Study: COVID-19 Infection Rate <span class="underline"></span></h2>
+            <div class="interactive card will-reveal">
+                <h3>Problem Setup</h3>
+                <p>Estimating the true infection rate in a population:</p>
+                <ul>
+                    <li><strong>Prior:</strong> Beta(2, 50) - expecting low infection rate</li>
+                    <li><strong>Data:</strong> 15 positive tests out of 200 people tested</li>
+                    <li><strong>Likelihood:</strong> Binomial(n=200, k=15)</li>
+                    <li><strong>Posterior:</strong> Beta(17, 235)</li>
+                </ul>
+                <h3>Results</h3>
+                <ul>
+                    <li><strong>Posterior Mean:</strong> 17/252 ≈ 0.067 (6.7%)</li>
+                    <li><strong>Posterior Median:</strong> ≈ 0.067</li>
+                    <li><strong>MAP Estimate:</strong> 16/250 = 0.064 (6.4%)</li>
+                    <li><strong>95% Credible Interval:</strong> [0.041, 0.099]</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- DRAWING BOARD -->
+    <section id="drawing-board" data-bg="draw">
+        <div class="drawing-container">
+            <div class="canvas-wrapper will-reveal">
+                <canvas id="drawingCanvas"></canvas>
+            </div>
+            <div class="drawing-controls">
+                <div class="color-picker">
+                    <div class="color-option color-black active" data-color="#000000" title="Black"></div>
+                    <div class="color-option color-red" data-color="#e53e3e" title="Red"></div>
+                    <div class="color-option color-blue" data-color="#3182ce" title="Blue"></div>
+                    <div class="color-option color-green" data-color="#38a169" title="Green"></div>
+                    <div class="color-option color-purple" data-color="#805ad5" title="Purple"></div>
+                    <div class="color-option color-yellow" data-color="#ecc94b" title="Yellow"></div>
+                </div>
+
+                <div>
+                    <span>Brush Size:</span>
+                    <input type="range" min="1" max="20" value="3" class="brush-size" id="brushSize" />
+                </div>
+
+                <button class="control-btn" id="clearCanvas"><i class="fas fa-trash-alt"></i> Clear</button>
+                <button class="control-btn" id="eraseMode"><i class="fas fa-eraser"></i> Erase</button>
+                <button class="control-btn" id="drawMode"><i class="fas fa-pencil-alt"></i> Draw</button>
+                <button class="control-btn" id="downloadCanvas"><i class="fas fa-download"></i> Save</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCLUSION -->
+    <section id="conclusion" data-bg="end">
+        <h1 class="mask-reveal"><span>Conclusion</span></h1>
+        <div class="card will-reveal">
+            <h2>Key Takeaways <span class="underline"></span></h2>
+            <ul>
+                <li><strong>Bayesian Framework:</strong> Provides a coherent way to combine prior knowledge with data</li>
+                <li><strong>Flexibility:</strong> Different priors and loss functions for different scenarios</li>
+                <li><strong>Uncertainty Quantification:</strong> Natural way to express uncertainty through posterior distribution</li>
+                <li><strong>Decision Theory:</strong> Links estimation to real-world consequences through loss functions</li>
+            </ul>
+
+            <h2>Advantages of Bayesian Point Estimation <span class="underline"></span></h2>
+            <div class="grid">
+                <div class="card will-reveal"><h3>✓ Incorporates Prior Knowledge</h3><p>Can leverage expert opinion and historical data</p></div>
+                <div class="card will-reveal"><h3>✓ Handles Small Samples</h3><p>Particularly useful when data is limited</p></div>
+                <div class="card will-reveal"><h3>✓ Sequential Learning</h3><p>Easy to update as new data arrives</p></div>
+                <div class="card will-reveal"><h3>✓ Interpretability</h3><p>Probabilistic statements are intuitive</p></div>
+            </div>
+
+            <h2>Challenges and Considerations <span class="underline"></span></h2>
+            <ul>
+                <li><strong>Prior Selection:</strong> Results can be sensitive to prior choice</li>
+                <li><strong>Computational Complexity:</strong> May require MCMC or other advanced methods</li>
+                <li><strong>Subjectivity:</strong> Prior beliefs introduce subjective element</li>
+                <li><strong>Model Misspecification:</strong> Wrong likelihood can lead to poor inference</li>
+            </ul>
+
+            <h2>Future Directions <span class="underline"></span></h2>
+            <div class="interactive card will-reveal">
+                <p>Bayesian methods continue to evolve with:</p>
+                <ul>
+                    <li>Advances in computational methods (Variational Inference, HMC)</li>
+                    <li>Integration with deep learning (Bayesian Neural Networks)</li>
+                    <li>Automated prior selection methods</li>
+                    <li>Scalable algorithms for big data</li>
+                    <li>Applications in AI safety and uncertainty quantification</li>
+                </ul>
+            </div>
+
+            <h2>Thank You!</h2>
+            <p style="text-align: center; font-size: 1.2rem; margin-top: 2rem;">
+                Thank you for exploring Bayesian Point Estimation with us. We hope this presentation has provided 
+                valuable insights into this powerful statistical framework.
+            </p>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <a href="#intro" class="btn">Back to Introduction</a>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 Bayesian Point Estimation Presentation | Created for Educational Purposes</p>
+        </footer>
+    </section>
+
+    <script>
+        // Utility: attach ripple to buttons and icons
+        function attachRipple(el) {
+            el.addEventListener('pointerdown', (e) => {
+                const rect = el.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple';
+                // size = max dimension
+                const size = Math.max(rect.width, rect.height) * 1.8;
+                const x = (e.clientX - rect.left);
+                const y = (e.clientY - rect.top);
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.style.width = ripple.style.height = size + 'px';
+                el.appendChild(ripple);
+                ripple.addEventListener('animationend', () => ripple.remove());
+            });
+        }
+
+        // Ambient Particles Canvas (lightweight) - now with pause on hidden tab
+        class AmbientParticles {
+            constructor(canvas) {
+                this.canvas = canvas;
+                this.ctx = canvas.getContext('2d');
+                this.particles = [];
+                this.paletteDark = ['#4f46e5', '#8b5cf6', '#06b6d4', '#22d3ee'];
+                this.paletteLight = ['#6366f1', '#8b5cf6', '#06b6d4', '#0ea5e9'];
+                this.colorSet = this.paletteDark;
+                this.running = true;
+                this._raf = null;
+                this.init();
+            }
+            init() {
+                const resize = () => {
+                    this.canvas.width = innerWidth * Math.min(devicePixelRatio || 1, 1.5);
+                    this.canvas.height = innerHeight * Math.min(devicePixelRatio || 1, 1.5);
+                    this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+                };
+                resize();
+                addEventListener('resize', resize, { passive: true });
+                const count = Math.min(60, Math.max(35, Math.round((innerWidth * innerHeight) / 60000)));
+                for (let i = 0; i < count; i++) this.particles.push(this.rand());
+                const loop = (t) => {
+                    if (!this.running || document.hidden) { this._raf = requestAnimationFrame(loop); return; }
+                    this.draw(t);
+                    this._raf = requestAnimationFrame(loop);
+                };
+                this._raf = requestAnimationFrame(loop);
+                document.addEventListener('visibilitychange', () => { this.running = !document.hidden; }, { passive: true });
+            }
+            setTheme(isDark) { this.colorSet = isDark ? this.paletteDark : this.paletteLight; }
+            rand() {
+                return {
+                    x: Math.random() * innerWidth, y: Math.random() * innerHeight,
+                    vx: (Math.random() - 0.5) * 0.25, vy: (Math.random() - 0.5) * 0.25,
+                    r: Math.random() * 2 + 0.5, hue: this.colorSet[(Math.random() * this.colorSet.length) | 0],
+                    alpha: Math.random() * 0.35 + 0.1, drift: Math.random() * 0.6 + 0.2,
+                };
+            }
+            draw(t) {
+                const ctx = this.ctx;
+                ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                const grad = ctx.createLinearGradient(0, 0, this.canvas.width, this.canvas.height);
+                grad.addColorStop(0, 'rgba(99,102,241,0.05)'); grad.addColorStop(1, 'rgba(6,182,212,0.04)');
+                ctx.fillStyle = grad; ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                const time = (t || 0) * 0.0003;
+                for (const p of this.particles) {
+                    p.x += p.vx + Math.sin(time + p.drift) * 0.1;
+                    p.y += p.vy + Math.cos(time + p.drift) * 0.1;
+                    if (p.x < -20) p.x = innerWidth + 20;
+                    if (p.x > innerWidth + 20) p.x = -20;
+                    if (p.y < -20) p.y = innerHeight + 20;
+                    if (p.y > innerHeight + 20) p.y = -20;
+                    ctx.beginPath(); ctx.fillStyle = p.hue; ctx.globalAlpha = p.alpha;
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            }
+        }
+
+        // Smooth scroll with Lenis (optional)
+        let lenis;
+        function setupLenis() {
+            try {
+                if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+                if (typeof Lenis === 'undefined') return;
+                lenis = new Lenis({ duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 2), smoothWheel: true, smoothTouch: false });
+                function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
+                requestAnimationFrame(raf);
+            } catch(e) {}
+        }
+
+        // Scroll progress
+        function setupScrollProgress() {
+            const bar = document.getElementById('progressBar');
+            const update = () => {
+                const h = document.documentElement;
+                const scrolled = (h.scrollTop || document.body.scrollTop);
+                const height = h.scrollHeight - h.clientHeight;
+                const progress = Math.max(0, Math.min(1, scrolled / height));
+                bar.style.width = (progress * 100).toFixed(2) + '%';
+            };
+            document.addEventListener('scroll', update, { passive: true });
+            update();
+        }
+
+        // Nav show/hide + active link
+        function setupNav() {
+            const nav = document.querySelector('nav');
+            const trigger = document.querySelector('.nav-trigger');
+            const links = [...document.querySelectorAll('.nav-link')];
+
+            let hideTimeout;
+            trigger.addEventListener('mouseenter', () => { nav.classList.add('visible'); if (hideTimeout) clearTimeout(hideTimeout); });
+            trigger.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => nav.classList.remove('visible'), 300); });
+            nav.addEventListener('mouseenter', () => { if (hideTimeout) clearTimeout(hideTimeout); nav.classList.add('visible'); });
+            nav.addEventListener('mouseleave', () => { hideTimeout = setTimeout(() => nav.classList.remove('visible'), 300); });
+
+            links.forEach((a) => {
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = a.getAttribute('href');
+                    const el = document.querySelector(id);
+                    if (!el) return;
+                    const top = el.getBoundingClientRect().top + window.scrollY - 70;
+                    if (lenis) { lenis.scrollTo(top, { offset: 0, duration: 1.0 }); }
+                    else { window.scrollTo({ top, behavior: 'smooth' }); }
+                    nav.classList.remove('visible');
+                });
+            });
+
+            // Active link while scrolling
+            const sections = [...document.querySelectorAll('section[id]')];
+            const io = new IntersectionObserver(
+                (entries) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            const id = '#' + entry.target.id;
+                            links.forEach((l) => l.classList.toggle('active', l.getAttribute('href') === id));
+                        }
+                    });
+                },
+                { rootMargin: '-40% 0px -55% 0px', threshold: 0.01 }
+            );
+            sections.forEach((s) => io.observe(s));
+        }
+
+        // Theme toggle with animated gradient palette updates
+        function setupThemeToggle(ambient) {
+            const btn = document.getElementById('themeToggle');
+            const icon = btn.querySelector('i');
+            const initialDark = localStorage.getItem('darkMode') === 'true';
+            if (initialDark) { document.documentElement.setAttribute('data-theme', 'dark'); icon.className = 'fas fa-sun'; ambient?.setTheme(true); }
+            else { document.documentElement.setAttribute('data-theme', 'light'); icon.className = 'fas fa-moon'; ambient?.setTheme(false); }
+            btn.addEventListener('click', () => {
+                const isDark = document.documentElement.getAttribute('data-theme') !== 'dark';
+                document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+                localStorage.setItem('darkMode', String(isDark));
+                icon.className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+                ambient?.setTheme(isDark);
+            });
+            attachRipple(btn);
+        }
+
+        // Sound (ambient, optional, user-initiated)
+        function setupSound() {
+            const btn = document.getElementById('soundToggle');
+            let ctx, gain, osc1, osc2;
+            const start = async () => {
+                if (!ctx) {
+                    ctx = new (window.AudioContext || window.webkitAudioContext)();
+                    gain = ctx.createGain(); gain.gain.value = 0.0; gain.connect(ctx.destination);
+                    osc1 = ctx.createOscillator(); osc1.type = 'sine'; osc1.frequency.value = 220; osc1.connect(gain);
+                    osc2 = ctx.createOscillator(); osc2.type = 'sine'; osc2.frequency.value = 221.5; osc2.connect(gain);
+                    osc1.start(); osc2.start();
+                }
+                await ctx.resume();
+                const now = ctx.currentTime;
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.linearRampToValueAtTime(0.02, now + 0.6);
+            };
+            const stop = () => {
+                if (!ctx) return;
+                const now = ctx.currentTime;
+                gain.gain.cancelScheduledValues(now);
+                gain.gain.linearRampToValueAtTime(0.0, now + 0.5);
+            };
+            btn.addEventListener('click', async () => {
+                const pressed = btn.getAttribute('aria-pressed') === 'true';
+                if (pressed) { btn.setAttribute('aria-pressed', 'false'); btn.querySelector('i').className = 'fas fa-volume-mute'; stop(); }
+                else { btn.setAttribute('aria-pressed', 'true'); btn.querySelector('i').className = 'fas fa-volume-up'; await start(); }
+            });
+            attachRipple(btn);
+        }
+
+        // GSAP Scroll-based animations (progressive enhancement, no default hiding)
+        function setupScrollAnimations() {
+            if (!window.gsap || !window.ScrollTrigger || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            gsap.registerPlugin(ScrollTrigger);
+
+            // Reveal headings sliding from below
+            document.querySelectorAll('.mask-reveal').forEach((wrap) => {
+                const el = wrap.firstElementChild;
+                if (!el) return;
+                gsap.from(el, {
+                    yPercent: 120, opacity: 0, ease: 'power3.out', duration: 1.1,
+                    scrollTrigger: { trigger: wrap, start: 'top 80%' },
+                });
+            });
+
+            // Cards / blocks
+            document.querySelectorAll('section .card').forEach((card) => {
+                gsap.from(card, {
+                    opacity: 0, y: 28, scale: 0.98, duration: 0.7, ease: 'power3.out',
+                    scrollTrigger: { trigger: card, start: 'top 85%', toggleActions: 'play none none reverse' },
+                });
+            });
+
+            // Parallax h1
+            document.querySelectorAll('section h1').forEach((h) => {
+                gsap.to(h, {
+                    yPercent: -12, ease: 'none',
+                    scrollTrigger: { trigger: h.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+                });
+            });
+        }
+
+        // Fancy hover glow on cards + mouse position CSS var
+        function setupCardMouseFX() {
+            document.querySelectorAll('.card').forEach((card) => {
+                let raf = null, tx = 0, ty = 0;
+                const reset = () => { card.style.transform = ''; };
+                const onMove = (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mx', (x / rect.width) * 100 + '%');
+                    card.style.setProperty('--my', (y / rect.height) * 100 + '%');
+
+                    // Subtle 3D tilt
+                    const rx = ((y / rect.height) - 0.5) * -6; // rotateX
+                    const ry = ((x / rect.width) - 0.5) * 6;   // rotateY
+                    if (!raf) {
+                        raf = requestAnimationFrame(() => {
+                            card.style.transform = `translateY(-6px) rotateX(${rx.toFixed(2)}deg) rotateY(${ry.toFixed(2)}deg)`;
+                            raf = null;
+                        });
+                    }
+                };
+                card.addEventListener('pointermove', onMove);
+                card.addEventListener('pointerleave', reset);
+            });
+        }
+
+        // Drawing board (unchanged content, improved init)
+        function setupDrawingBoard() {
+            const section = document.getElementById('drawing-board');
+            const canvas = document.getElementById('drawingCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d', { alpha: false });
+            const wrapper = canvas.parentElement;
+
+            let isDrawing = false, lastX = 0, lastY = 0, currentColor = '#000000', brushSize = 3, isErasing = false, initialized = false;
+
+            function resizeCanvas() {
+                const rect = wrapper.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = Math.max(rect.height, 300);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            }
+            function init() {
+                if (initialized) return; initialized = true; resizeCanvas(); window.addEventListener('resize', resizeCanvas, { passive: true });
+
+                function startDrawing(e) {
+                    isDrawing = true;
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = (e.clientX ?? e.touches?.[0]?.clientX);
+                    const cy = (e.clientY ?? e.touches?.[0]?.clientY);
+                    lastX = cx - rect.left; lastY = cy - rect.top;
+                }
+                function draw(e) {
+                    if (!isDrawing) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const cx = (e.clientX ?? e.touches?.[0]?.clientX);
+                    const cy = (e.clientY ?? e.touches?.[0]?.clientY);
+                    const x = cx - rect.left; const y = cy - rect.top;
+
+                    ctx.lineJoin = 'round'; ctx.lineCap = 'round'; ctx.lineWidth = brushSize;
+                    ctx.strokeStyle = isErasing ? 'white' : currentColor;
+                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+                    lastX = x; lastY = y;
+                }
+                function stopDrawing() { isDrawing = false; }
+
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stopDrawing);
+                canvas.addEventListener('mouseleave', stopDrawing);
+
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
+                canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }, { passive: false });
+                canvas.addEventListener('touchend', stopDrawing, { passive: false });
+
+                document.querySelectorAll('.color-option').forEach((opt) => {
+                    opt.addEventListener('click', function() {
+                        document.querySelectorAll('.color-option').forEach((el) => el.classList.remove('active'));
+                        this.classList.add('active'); currentColor = this.getAttribute('data-color');
+                        isErasing = false; document.getElementById('drawMode').classList.add('active'); document.getElementById('eraseMode').classList.remove('active');
+                    });
+                });
+
+                document.getElementById('brushSize')?.addEventListener('input', function() { brushSize = +this.value; });
+
+                document.getElementById('clearCanvas')?.addEventListener('click', function() { ctx.fillStyle = 'white'; ctx.fillRect(0, 0, canvas.width, canvas.height); });
+                document.getElementById('eraseMode')?.addEventListener('click', function() { isErasing = true; this.classList.add('active'); document.getElementById('drawMode').classList.remove('active'); });
+                const drawBtn = document.getElementById('drawMode');
+                drawBtn?.addEventListener('click', function() { isErasing = false; this.classList.add('active'); document.getElementById('eraseMode').classList.remove('active'); });
+                drawBtn?.classList.add('active');
+
+                document.getElementById('downloadCanvas')?.addEventListener('click', function() {
+                    const link = document.createElement('a'); link.download = 'bayesian-drawing.png'; link.href = canvas.toDataURL('image/png'); link.click();
+                });
+
+                document.querySelectorAll('.control-btn').forEach(attachRipple);
+            }
+
+            // Initialize when section enters viewport
+            const io = new IntersectionObserver((entries) => { entries.forEach((e) => { if (e.isIntersecting) init(); }); }, { rootMargin: '0px 0px -30% 0px' });
+            io.observe(section);
+        }
+
+        // Desmos links
+        function setupDesmos() {
+            document.querySelectorAll('.calc-link').forEach(function(btn) {
+                attachRipple(btn);
+                btn.addEventListener('click', function() {
+                    const url = this.getAttribute('data-url');
+                    const iframeContainer = document.getElementById('iframeContainer');
+                    const calculatorFrame = document.getElementById('calculatorFrame');
+                    calculatorFrame.src = url;
+                    iframeContainer.style.display = 'block';
+                    iframeContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            });
+        }
+
+        // Keyboard navigation
+        function setupKeyboardNav() {
+            document.addEventListener('keydown', function(e) {
+                const navLinks = document.querySelectorAll('.nav-link');
+                const activeLink = document.querySelector('.nav-link.active');
+                const all = Array.from(navLinks);
+                const idx = all.indexOf(activeLink);
+                if (e.key === 'ArrowRight' && idx < all.length - 1) all[idx + 1].click();
+                else if (e.key === 'ArrowLeft' && idx > 0) all[idx - 1].click();
+            });
+        }
+
+        // Section-driven dynamic background theming & morphing
+        function setupSectionTheming() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+            const palette = {
+                intro:       ['rgba(99,102,241,0.18)', 'rgba(139,92,246,0.15)', 'rgba(6,182,212,0.14)'],
+                pe:          ['rgba(16,185,129,0.18)', 'rgba(59,130,246,0.15)', 'rgba(99,102,241,0.14)'],
+                prior:       ['rgba(236,72,153,0.18)', 'rgba(168,85,247,0.15)', 'rgba(59,130,246,0.14)'],
+                likelihood:  ['rgba(245,158,11,0.20)', 'rgba(99,102,241,0.15)', 'rgba(56,189,248,0.14)'],
+                bayes:       ['rgba(34,197,94,0.18)', 'rgba(99,102,241,0.15)', 'rgba(139,92,246,0.14)'],
+                posterior:   ['rgba(99,102,241,0.18)', 'rgba(6,182,212,0.16)', 'rgba(20,184,166,0.16)'],
+                loss:        ['rgba(244,63,94,0.18)', 'rgba(234,179,8,0.16)', 'rgba(99,102,241,0.14)'],
+                estimators:  ['rgba(14,165,233,0.18)', 'rgba(99,102,241,0.16)', 'rgba(139,92,246,0.14)'],
+                applications:['rgba(99,102,241,0.18)', 'rgba(168,85,247,0.15)', 'rgba(6,182,212,0.14)'],
+                draw:        ['rgba(139,92,246,0.18)', 'rgba(99,102,241,0.15)', 'rgba(6,182,212,0.14)'],
+                end:         ['rgba(236,72,153,0.18)', 'rgba(99,102,241,0.15)', 'rgba(6,182,212,0.14)'],
+            };
+
+            const root = document.documentElement.style;
+
+            const setGrad = (arr) => {
+                const [g1, g2, g3] = arr;
+                root.setProperty('--grad1', g1);
+                root.setProperty('--grad2', g2);
+                root.setProperty('--grad3', g3);
+            };
+
+            // Initialize with first visible section palette
+            const firstVisible = document.elementFromPoint(innerWidth/2, innerHeight*0.3)?.closest('section[data-bg]');
+            if (firstVisible) setGrad(palette[firstVisible.dataset.bg] || palette.intro);
+
+            // Use IntersectionObserver to transition palettes; GSAP used for tweening
+            const io = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const key = entry.target.dataset.bg;
+                        const [g1, g2, g3] = palette[key] || palette.intro;
+                        if (window.gsap) {
+                            gsap.to({}, {
+                                duration: 0.8,
+                                onUpdate: function() {
+                                    root.setProperty('--grad1', g1);
+                                    root.setProperty('--grad2', g2);
+                                    root.setProperty('--grad3', g3);
+                                },
+                                ease: 'power2.out'
+                            });
+                        } else {
+                            setGrad([g1, g2, g3]);
+                        }
+                    }
+                });
+            }, { rootMargin: '-45% 0px -45% 0px', threshold: 0.01 });
+            document.querySelectorAll('section[data-bg]').forEach(s => io.observe(s));
+        }
+
+        // Morphing SVG background (Anime.js). Injected dynamically; non-blocking.
+        function setupMorphingBackground() {
+            if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+            if (typeof anime === 'undefined') return;
+
+            const host = document.querySelector('.ambient-canvas-wrap');
+            if (!host) return;
+
+            const svgNS = 'http://www.w3.org/2000/svg';
+            const svg = document.createElementNS(svgNS, 'svg');
+            svg.setAttribute('viewBox', '0 0 1200 800');
+            svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+            Object.assign(svg.style, {
+                position: 'absolute',
+                inset: '0',
+                zIndex: '-2',
+                opacity: '0.35',
+                filter: 'blur(20px)',
+                pointerEvents: 'none'
+            });
+
+            const defs = document.createElementNS(svgNS, 'defs');
+            const grad = document.createElementNS(svgNS, 'linearGradient');
+            grad.id = 'bggrad';
+            grad.setAttribute('x1', '0%'); grad.setAttribute('y1', '0%');
+            grad.setAttribute('x2', '100%'); grad.setAttribute('y2', '100%');
+            const stop1 = document.createElementNS(svgNS, 'stop'); stop1.setAttribute('offset', '0%'); stop1.setAttribute('stop-color', '#6366f1');
+            const stop2 = document.createElementNS(svgNS, 'stop'); stop2.setAttribute('offset', '100%'); stop2.setAttribute('stop-color', '#06b6d4');
+            grad.appendChild(stop1); grad.appendChild(stop2);
+            defs.appendChild(grad);
+            svg.appendChild(defs);
+
+            const path = document.createElementNS(svgNS, 'path');
+            path.setAttribute('fill', 'url(#bggrad)');
+            path.setAttribute('opacity', '0.7');
+            svg.appendChild(path);
+            host.appendChild(svg);
+
+            // A few organic blob shapes to morph between
+            const shapes = [
+                'M0,0 C300,50 400,200 600,140 C820,70 930,230 1200,100 L1200,800 L0,800 Z',
+                'M0,0 C240,120 460,40 620,180 C820,340 940,210 1200,300 L1200,800 L0,800 Z',
+                'M0,0 C200,180 500,80 620,200 C740,320 980,180 1200,380 L1200,800 L0,800 Z',
+                'M0,0 C220,120 420,240 640,180 C900,100 1000,280 1200,220 L1200,800 L0,800 Z'
+            ];
+
+            let idx = 0;
+            path.setAttribute('d', shapes[idx]);
+
+            function cycle() {
+                const next = (idx + 1) % shapes.length;
+                anime({
+                    targets: path,
+                    d: [{ value: shapes[next] }],
+                    duration: 6000,
+                    easing: 'easeInOutQuad',
+                    complete: () => {
+                        idx = next;
+                        // Small dwell before next morph to feel organic
+                        setTimeout(cycle, 1200);
+                    },
+                });
+            }
+
+            // Kick off the morphing loop
+            cycle();
+        }
+
+        // Bootstrap all features after DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            // Ambient particles
+            const ambientCanvas = document.getElementById('ambientCanvas');
+            let ambient = null;
+            if (ambientCanvas && ambientCanvas.getContext) {
+                try {
+                    ambient = new AmbientParticles(ambientCanvas);
+                } catch (e) {
+                    // Fail gracefully if canvas init fails
+                    console.warn('AmbientParticles init failed:', e);
+                }
+            }
+
+            // Core setup
+            setupLenis();
+            setupScrollProgress();
+            setupNav();
+            setupThemeToggle(ambient);
+            setupSound();
+            setupScrollAnimations();
+            setupCardMouseFX();
+            setupDrawingBoard();
+            setupDesmos();
+            setupKeyboardNav();
+            setupSectionTheming();
+            setupMorphingBackground();
+
+            // Enhance remaining buttons with ripple
+            document.querySelectorAll('.btn, .control-btn, .control-icon').forEach(attachRipple);
+        });
+
+        // Refresh ScrollTrigger after all assets load for accurate positions
+        window.addEventListener('load', () => {
+            if (window.ScrollTrigger && window.gsap) {
+                try { window.ScrollTrigger.refresh(); } catch(e) {}
+            }
+        });
+    </script>
+</body>
+</html>
